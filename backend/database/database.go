@@ -25,11 +25,10 @@ func Connect() {
 }
 
 // VULNERABILITY #1: Raw SQL execution without parameterization
-func ExecuteRawSQL(query string) ([]map[string]interface{}, error) {
+func ExecuteRawSQL(query string, args ...interface{}) ([]map[string]interface{}, error) {
 	var results []map[string]interface{}
 
-	// This allows SQL injection!
-	rows, err := DB.Raw(query).Rows()
+	rows, err := DB.Raw(query, args...).Rows()
 	if err != nil {
 		return nil, err
 	}
