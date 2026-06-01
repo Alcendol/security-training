@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"html"
 	"net/http"
 	"securetask/database"
 	"securetask/models"
@@ -9,9 +10,16 @@ import (
 )
 
 type CreateTaskRequest struct {
-	Title       string `json:"title" binding:"required"`
-	Description string `json:"description"`
-	Priority    string `json:"priority"`
+	Title       string `json:"title" binding:"required,max=200"`
+	Description string `json:"description" binding:"max=2000"`
+	Priority    string `json:"priority" binding:"omitempty,oneof=low medium high"`
+}
+
+type UpdateTaskRequest struct {
+	Title       *string `json:"title" binding:"omitempty,max=200"`
+	Description *string `json:"description" binding:"omitempty,max=2000"`
+	Priority    *string `json:"priority" binding:"omitempty,oneof=low medium high"`
+	Status      *string `json:"status" binding:"omitempty,oneof=todo in_progress done"`
 }
 
 func GetTasks(c *gin.Context) {
@@ -23,7 +31,6 @@ func GetTasks(c *gin.Context) {
 	c.JSON(http.StatusOK, tasks)
 }
 
-// VULNERABILITY #2: No input validation or sanitization
 func CreateTask(c *gin.Context) {
 	var req CreateTaskRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -33,10 +40,9 @@ func CreateTask(c *gin.Context) {
 
 	userID := c.GetUint("user_id")
 
-	// VULNERABILITY #3: No sanitization - XSS possible through description
 	task := models.Task{
-		Title:       req.Title,       // No sanitization
-		Description: req.Description, // XSS vulnerability!
+		Title:       html.EscapeString(req.Title),
+		Description: html.EscapeString(req.Description),
 		Priority:    req.Priority,
 		Status:      "todo",
 		UserID:      userID,
@@ -60,14 +66,26 @@ func UpdateTask(c *gin.Context) {
 		return
 	}
 
-	// VULNERABILITY #2: No input validation
-	var updates map[string]interface{}
-	if err := c.ShouldBindJSON(&updates); err != nil {
+	var req UpdateTaskRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	// VULNERABILITY #3: No sanitization on updated fields
+	updates := map[string]interface{}{}
+	if req.Title != nil {
+		updates["title"] = html.EscapeString(*req.Title)
+	}
+	if req.Description != nil {
+		updates["description"] = html.EscapeString(*req.Description)
+	}
+	if req.Priority != nil {
+		updates["priority"] = *req.Priority
+	}
+	if req.Status != nil {
+		updates["status"] = *req.Status
+	}
+
 	database.DB.Model(&task).Updates(updates)
 
 	c.JSON(http.StatusOK, task)

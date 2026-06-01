@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"html"
 	"net/http"
 	"securetask/database"
 	"securetask/models"
@@ -8,6 +9,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 )
+
+type UpdateProfileRequest struct {
+	Name *string `json:"name" binding:"omitempty,max=100"`
+	Bio  *string `json:"bio" binding:"omitempty,max=500"`
+}
 
 func GetCurrentUser(c *gin.Context) {
 	userID := c.GetUint("user_id")
@@ -35,17 +41,24 @@ func UpdateProfile(c *gin.Context) {
 		return
 	}
 
-	var updates map[string]interface{}
-	if err := c.ShouldBindJSON(&updates); err != nil {
+	var req UpdateProfileRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	
-	// VULNERABILITY #3: Bio field not sanitized - XSS vulnerability
+
 	var user models.User
 	if err := database.DB.First(&user, userID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
+	}
+
+	updates := map[string]interface{}{}
+	if req.Name != nil {
+		updates["name"] = html.EscapeString(*req.Name)
+	}
+	if req.Bio != nil {
+		updates["bio"] = html.EscapeString(*req.Bio)
 	}
 
 	database.DB.Model(&user).Updates(updates)

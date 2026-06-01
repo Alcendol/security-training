@@ -2,10 +2,12 @@ package handlers
 
 import (
 	"fmt"
+	"html"
 	"net/http"
 	"securetask/database"
 	"securetask/models"
 	"time"
+	"unicode"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -16,8 +18,21 @@ var jwtSecret = []byte("supersecret123")
 
 type RegisterRequest struct {
 	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
-	Name     string `json:"name" binding:"required"`
+	Password string `json:"password" binding:"required,min=8,max=72"`
+	Name     string `json:"name" binding:"required,max=100"`
+}
+
+func isStrongPassword(pw string) bool {
+	var hasLetter, hasDigit bool
+	for _, r := range pw {
+		switch {
+		case unicode.IsLetter(r):
+			hasLetter = true
+		case unicode.IsDigit(r):
+			hasDigit = true
+		}
+	}
+	return hasLetter && hasDigit
 }
 
 type LoginRequest struct {
@@ -25,7 +40,6 @@ type LoginRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
-// VULNERABILITY #2: No input validation, no password strength requirements
 func Register(c *gin.Context) {
 	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -33,11 +47,16 @@ func Register(c *gin.Context) {
 		return
 	}
 
+	if !isStrongPassword(req.Password) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Password must contain at least one letter and one number"})
+		return
+	}
+
 	// VULNERABILITY #5: Password stored in plain text (no hashing!)
 	user := models.User{
 		Email:    req.Email,
 		Password: req.Password, // Should be hashed with bcrypt!
-		Name:     req.Name,
+		Name:     html.EscapeString(req.Name),
 		Role:     "user",
 	}
 
