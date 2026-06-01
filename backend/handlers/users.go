@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"securetask/database"
 	"securetask/models"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
@@ -21,20 +22,25 @@ func GetCurrentUser(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// VULNERABILITY #2: No authentication required (exposed publicly in main.go)
-// VULNERABILITY #2: No authorization check - can update any user's profile
 func UpdateProfile(c *gin.Context) {
-	userID := c.Param("id")
+	targetID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user id"})
+		return
+	}
+
+	userID := c.GetUint("user_id")
+	if uint(targetID) != userID {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You can only update your own profile"})
+		return
+	}
 
 	var updates map[string]interface{}
 	if err := c.ShouldBindJSON(&updates); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	// VULNERABILITY #2: Anyone can update anyone's profile!
-	// No check if the authenticated user matches the profile being updated
-
+	
 	// VULNERABILITY #3: Bio field not sanitized - XSS vulnerability
 	var user models.User
 	if err := database.DB.First(&user, userID).Error; err != nil {
@@ -47,10 +53,11 @@ func UpdateProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// VULNERABILITY #2: No authentication required (exposed publicly in main.go)
-// VULNERABILITY #2: No authorization check - anyone can access admin endpoint
 func GetAllUsers(c *gin.Context) {
-	// Should check if user has admin role, but doesn't!
+	if c.GetString("role") != "admin" {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Admin access required"})
+		return
+	}
 
 	var users []models.User
 	database.DB.Find(&users)

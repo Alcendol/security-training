@@ -47,14 +47,6 @@ func main() {
 	r.POST("/api/auth/register", handlers.Register)
 	r.POST("/api/auth/login", handlers.Login)
 
-	// VULNERABILITY #2: No authentication middleware on these routes!
-	r.GET("/api/tasks/search", handlers.SearchTasks)        // Should require auth
-	r.DELETE("/api/tasks/:id", handlers.DeleteTask)         // Should require auth
-	r.PUT("/api/users/:id/profile", handlers.UpdateProfile) // Should require auth
-
-	// VULNERABILITY #2: Admin route with no authorization check
-	r.GET("/api/admin/users", handlers.GetAllUsers) // Anyone can access!
-
 	// Protected routes (with auth middleware)
 	authorized := r.Group("/api")
 	authorized.Use(handlers.AuthMiddleware())
@@ -62,7 +54,11 @@ func main() {
 		authorized.GET("/tasks", handlers.GetTasks)
 		authorized.POST("/tasks", handlers.CreateTask)
 		authorized.PUT("/tasks/:id", handlers.UpdateTask)
+		authorized.GET("/tasks/search", handlers.SearchTasks)
+		authorized.DELETE("/tasks/:id", handlers.DeleteTask)  
 		authorized.GET("/users/me", handlers.GetCurrentUser)
+		authorized.PUT("/users/:id/profile", handlers.UpdateProfile) 
+		authorized.GET("/admin/users", handlers.GetAllUsers)         
 	}
 
 	log.Println("🚀 Server starting on port 8080...")

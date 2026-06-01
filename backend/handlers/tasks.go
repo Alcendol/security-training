@@ -73,13 +73,17 @@ func UpdateTask(c *gin.Context) {
 	c.JSON(http.StatusOK, task)
 }
 
-// VULNERABILITY #2: No authentication required (exposed publicly in main.go)
-// VULNERABILITY #2: No authorization check
 func DeleteTask(c *gin.Context) {
 	taskID := c.Param("id")
+	userID := c.GetUint("user_id")
 
-	// Anyone can delete any task!
-	if err := database.DB.Delete(&models.Task{}, taskID).Error; err != nil {
+	var task models.Task
+	if err := database.DB.Where("id = ? AND user_id = ?", taskID, userID).First(&task).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
+		return
+	}
+
+	if err := database.DB.Delete(&task).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete task"})
 		return
 	}
