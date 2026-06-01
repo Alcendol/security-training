@@ -91,8 +91,6 @@ func DeleteTask(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Task deleted"})
 }
 
-// VULNERABILITY #1: SQL Injection in search functionality
-// VULNERABILITY #2: No authentication required (exposed publicly in main.go)
 func SearchTasks(c *gin.Context) {
 	searchTerm := c.Query("q")
 
@@ -101,11 +99,12 @@ func SearchTasks(c *gin.Context) {
 		return
 	}
 
+	userID := c.GetUint("user_id")
 	pattern := "%" + searchTerm + "%"
 
 	var tasks []models.Task
 	if err := database.DB.
-		Where("title ILIKE ? OR description ILIKE ?", pattern, pattern).
+		Where("user_id = ? AND (title ILIKE ? OR description ILIKE ?)", userID, pattern, pattern).
 		Find(&tasks).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Search failed"})
 		return
