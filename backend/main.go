@@ -18,6 +18,7 @@ func main() {
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found, reading environment variables from system")
 	}
+	handlers.LoadJWTSecret()
 
 	// Initialize database (credentials read from environment inside Connect())
 	database.Connect()
