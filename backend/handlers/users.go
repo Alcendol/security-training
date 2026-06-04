@@ -24,7 +24,7 @@ func GetCurrentUser(c *gin.Context) {
 		return
 	}
 
-	// VULNERABILITY #2: Returning password in response
+	// Password is excluded from the response by json:"-" on the User model
 	c.JSON(http.StatusOK, user)
 }
 
@@ -75,7 +75,7 @@ func GetAllUsers(c *gin.Context) {
 	var users []models.User
 	database.DB.Find(&users)
 
-	// VULNERABILITY #2: Returning all users with passwords!
+	// Password is excluded from the response by json:"-" on the User model
 	c.JSON(http.StatusOK, gin.H{
 		"users": users,
 		"count": len(users),

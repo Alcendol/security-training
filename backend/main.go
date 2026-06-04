@@ -2,24 +2,24 @@ package main
 
 import (
 	"log"
+	"os"
 	"securetask/database"
 	"securetask/handlers"
 	"securetask/models"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-)
-
-// VULNERABILITY #4: Hardcoded credentials directly in source code
-const (
-	// These should NEVER be hardcoded in production!
-	DB_CONNECTION = "host=localhost user=taskuser password=taskpass123 dbname=securetask port=5432 sslmode=disable"
-	JWT_SECRET    = "supersecret123"  // VULNERABILITY: Weak, hardcoded JWT secret
-	ADMIN_KEY     = "admin-key-12345" // VULNERABILITY: Hardcoded API key
+	"github.com/joho/godotenv"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func main() {
-	// Initialize database
+	// Load .env file (only used in local development; in production use real env vars)
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found, reading environment variables from system")
+	}
+
+	// Initialize database (credentials read from environment inside Connect())
 	database.Connect()
 
 	// Auto-migrate models
@@ -34,11 +34,16 @@ func main() {
 	// Setup Gin router
 	r := gin.Default()
 
-	// VULNERABILITY: Permissive CORS - allows all origins
+	// Restrict CORS to known origins in production.
+	// Read allowed origin from env; default to localhost for local dev.
+	allowedOrigin := os.Getenv("ALLOWED_ORIGIN")
+	if allowedOrigin == "" {
+		allowedOrigin = "http://localhost:5173"
+	}
 	r.Use(cors.New(cors.Config{
-		AllowAllOrigins:  true,
+		AllowOrigins:     []string{allowedOrigin},
 		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowHeaders:     []string{"*"},
+		AllowHeaders:     []string{"Authorization", "Content-Type"},
 		ExposeHeaders:    []string{"Content-Length"},
 		AllowCredentials: true,
 	}))
@@ -55,15 +60,18 @@ func main() {
 		authorized.POST("/tasks", handlers.CreateTask)
 		authorized.PUT("/tasks/:id", handlers.UpdateTask)
 		authorized.GET("/tasks/search", handlers.SearchTasks)
-		authorized.DELETE("/tasks/:id", handlers.DeleteTask)  
+		authorized.DELETE("/tasks/:id", handlers.DeleteTask)
 		authorized.GET("/users/me", handlers.GetCurrentUser)
-		authorized.PUT("/users/:id/profile", handlers.UpdateProfile) 
-		authorized.GET("/admin/users", handlers.GetAllUsers)         
+		authorized.PUT("/users/:id/profile", handlers.UpdateProfile)
+		authorized.GET("/admin/users", handlers.GetAllUsers)
 	}
 
-	log.Println("🚀 Server starting on port 8080...")
-	log.Println("⚠️  WARNING: This server contains intentional security vulnerabilities!")
-	r.Run(":8080")
+	port := os.Getenv("SERVER_PORT")
+	if port == "" {
+		port = "8080"
+	}
+	log.Printf("🚀 Server starting on port %s...", port)
+	r.Run(":" + port)
 }
 
 func seedData() {
@@ -74,25 +82,43 @@ func seedData() {
 		return // Data already seeded
 	}
 
-	// VULNERABILITY #5: Passwords stored in plain text (no hashing!)
-	users := []models.User{
+	type seedUser struct {
+		Email    string
+		Password string
+		Name     string
+		Role     string
+		Bio      string
+	}
+
+	seeds := []seedUser{
 		{
 			Email:    "admin@example.com",
-			Password: "admin123", // Plain text password!
+			Password: "Admin@secure1",
 			Name:     "Admin User",
 			Role:     "admin",
 			Bio:      "I'm the administrator",
 		},
 		{
 			Email:    "user@example.com",
-			Password: "password123", // Plain text password!
+			Password: "User@secure1",
 			Name:     "Regular User",
 			Role:     "user",
 			Bio:      "Just a regular user",
 		},
 	}
 
-	for _, user := range users {
+	for _, s := range seeds {
+		hashed, err := bcrypt.GenerateFromPassword([]byte(s.Password), bcrypt.DefaultCost)
+		if err != nil {
+			log.Fatalf("Failed to hash seed password for %s: %v", s.Email, err)
+		}
+		user := models.User{
+			Email:    s.Email,
+			Password: string(hashed),
+			Name:     s.Name,
+			Role:     s.Role,
+			Bio:      s.Bio,
+		}
 		database.DB.Create(&user)
 	}
 
