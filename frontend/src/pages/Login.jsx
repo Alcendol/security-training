@@ -106,11 +106,7 @@ function Login({ setAuth }) {
           </Link>
         </div>
 
-        <div className="mt-6 p-4 bg-gray-100 rounded text-sm">
-          <p className="font-semibold mb-2">Test Accounts:</p>
-          <p className="text-gray-700">User: user@example.com / password123</p>
-          <p className="text-gray-700">Admin: admin@example.com / admin123</p>
-        </div>
+
       </div>
     </div>
   );
