@@ -95,14 +95,14 @@ func seedData() {
 	seeds := []seedUser{
 		{
 			Email:    "admin@example.com",
-			Password: "Admin@secure1",
+			Password: "admin123",
 			Name:     "Admin User",
 			Role:     "admin",
 			Bio:      "I'm the administrator",
 		},
 		{
 			Email:    "user@example.com",
-			Password: "User@secure1",
+			Password: "password123",
 			Name:     "Regular User",
 			Role:     "user",
 			Bio:      "Just a regular user",
