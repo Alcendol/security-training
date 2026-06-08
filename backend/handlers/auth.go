@@ -8,6 +8,7 @@ import (
 	"os"
 	"securetask/database"
 	"securetask/models"
+	"strings"
 	"time"
 	"unicode"
 
@@ -18,6 +19,25 @@ import (
 
 // jwtSecret is loaded once from the environment at startup.
 var jwtSecret []byte
+
+const (
+	authCookieName = "auth_token"
+	authCookieMaxAge = 60 * 60 * 24 // 24 hours
+)
+
+func cookieSecure() bool {
+	return strings.HasPrefix(os.Getenv("ALLOWED_ORIGIN"), "https://")
+}
+
+func setAuthCookie(c *gin.Context, token string) {
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie(authCookieName, token, authCookieMaxAge, "/", "", cookieSecure(), true)
+}
+
+func clearAuthCookie(c *gin.Context) {
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie(authCookieName, "", -1, "/", "", cookieSecure(), true)
+}
 
 func LoadJWTSecret() {
 	secret := os.Getenv("JWT_SECRET")
@@ -132,20 +152,29 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// Password is excluded by json:"-" on the model
+	setAuthCookie(c, tokenString)
+
 	c.JSON(http.StatusOK, gin.H{
-		"token": tokenString,
-		"user":  user,
+		"user": user,
 	})
+}
+
+func Logout(c *gin.Context) {
+	clearAuthCookie(c)
+	c.JSON(http.StatusOK, gin.H{"message": "Logged out successfully"})
 }
 
 func AuthMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tokenString := c.GetHeader("Authorization")
-		if tokenString == "" {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header required"})
-			c.Abort()
-			return
+		tokenString, err := c.Cookie(authCookieName)
+		if err != nil || tokenString == "" {
+			header := c.GetHeader("Authorization")
+			if header == "" {
+				c.JSON(http.StatusUnauthorized, gin.H{"error": "Authentication required"})
+				c.Abort()
+				return
+			}
+			tokenString = header
 		}
 
 		// Remove "Bearer " prefix if present
