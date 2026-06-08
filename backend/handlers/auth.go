@@ -19,7 +19,7 @@ import (
 // jwtSecret is loaded once from the environment at startup.
 var jwtSecret []byte
 
-func init() {
+func LoadJWTSecret() {
 	secret := os.Getenv("JWT_SECRET")
 	if secret == "" {
 		log.Fatal("JWT_SECRET environment variable must be set")
