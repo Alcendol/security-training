@@ -16,10 +16,6 @@ function Login({ setAuth }) {
     try {
       const response = await login(email, password);
 
-      // VULNERABILITY #5: Storing token in localStorage (vulnerable to XSS)
-      // setToken(response.data.token);
-
-      // VULNERABILITY #5: Storing full user object including password
       const user = response.data.user;
       setUserData({
         id: user.id,
@@ -27,23 +23,11 @@ function Login({ setAuth }) {
         email: user.email,
         role: user.role,
       });
-      // setUserData(response.data.user);
-
-      // VULNERABILITY: Storing sensitive debug info
-      // saveDebugInfo({
-      //   action: 'login',
-      //   email: email,
-      //   timestamp: new Date(),
-      //   userAgent: navigator.userAgent
-      // });
 
       setAuth(true);
       navigate("/dashboard");
     } catch (err) {
-      // VULNERABILITY: Exposing detailed error messages
-      // setError(err.response?.data?.error || "Login failed");
-      // console.error("Login error:", err.response?.data);
-      setError("Login failed")
+      setError("Login failed");
     }
   };
 

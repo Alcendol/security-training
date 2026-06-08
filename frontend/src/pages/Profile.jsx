@@ -35,7 +35,6 @@ function Profile() {
     setMessage('');
 
     try {
-      // VULNERABILITY #2: No authorization check - can update any user's profile
       const response = await updateProfile(user.id, formData);
       
       // Only store non-sensitive user data

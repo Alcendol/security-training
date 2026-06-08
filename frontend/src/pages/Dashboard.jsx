@@ -67,7 +67,6 @@ function Dashboard() {
     }
   };
 
-  // VULNERABILITY #1: No sanitization before sending search query (SQL Injection on backend)
   const handleSearch = async (e) => {
     e.preventDefault();
     try {
@@ -79,15 +78,11 @@ function Dashboard() {
       if (process.env.NODE_ENV === "development") {
         console.error("Search failed:", error);
       }
-      // alert(
-      //   "Search failed: " + (error.response?.data?.error || "Unknown error"),
-      // );
       setError("Pencarian gagal. Coba lagi.");
     }
   };
 
   const handleLogout = () => {
-    // removeToken();
     clearUserData();
     navigate("/login");
   };
@@ -103,8 +98,7 @@ function Dashboard() {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-gray-700">
-                {/* VULNERABILITY #5: Displaying sensitive user data from localStorage */}
-                Welcome, {user?.name} {/* ({user?.email}) */ }
+                Welcome, {user?.name}
               </span>
               <Link to="/profile" className="text-blue-500 hover:underline">
                 Profile
@@ -229,11 +223,6 @@ function Dashboard() {
                       <h3 className="text-lg font-semibold text-gray-900">
                         {task.title}
                       </h3>
-                      {/* VULNERABILITY #3: Rendering unsanitized HTML - XSS attack vector! */}
-                      {/* <div  */}
-                      {/*   className="text-gray-600 mt-2" */}
-                      {/*   dangerouslySetInnerHTML={{ __html: task.description }} */}
-                      {/* /> */}
                       <p className="text-gray-600 mt-2">{task.description}</p>
                       <div className="mt-2 flex gap-2">
                         <span
