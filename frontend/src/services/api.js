@@ -1,18 +1,18 @@
 import axios from "axios";
 import { API_BASE_URL } from "../config";
-import { getToken } from "../utils/storage";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true,
 });
 
 // VULNERABILITY: Logging sensitive data
 api.interceptors.request.use(
   (config) => {
-    const token = getToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    // const token = getToken();
+    // if (token) {
+    //   config.headers.Authorization = `Bearer ${token}`;
+    // }
 
     // VULNERABILITY: Logging requests with sensitive data
     if (process.env.NODE_ENV === "development") {
@@ -24,7 +24,9 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    console.error("Request Error:", error);
+    if (process.env.NODE_ENV === "development") {
+      console.error("Request Error:", error);
+    }
     return Promise.reject(error);
   },
 );
@@ -93,10 +95,10 @@ export const updateProfile = (userId, profileData) => {
 // VULNERABILITY #2: Admin endpoint accessible without proper authorization check
 // VULNERABILITY #4: Hardcoded API key sent in request
 export const getAllUsers = () => {
-  const role = getUserRole();
-  if (role !== "admin") {
-    return Promise.reject(new Error("Unauthorized"));
-  }
+  // const role = getUserRole();
+  // if (role !== "admin") {
+  //   return Promise.reject(new Error("Unauthorized"));
+  // }
   return api.get("/admin/users", {
     // headers: {
     //   "X-Admin-Key": ADMIN_API_KEY, // Hardcoded admin key!

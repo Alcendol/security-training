@@ -1,17 +1,17 @@
 // VULNERABILITY #5: Insecure storage of sensitive data
 
 // VULNERABILITY: Storing JWT token in localStorage (vulnerable to XSS)
-export const setToken = (token) => {
-  localStorage.setItem('token', token); // Should use httpOnly cookies!
-};
-
-export const getToken = () => {
-  return localStorage.getItem('token');
-};
-
-export const removeToken = () => {
-  localStorage.removeItem('token');
-};
+// export const setToken = (token) => {
+//   localStorage.setItem('token', token); // Should use httpOnly cookies!
+// };
+//
+// export const getToken = () => {
+//   return localStorage.getItem('token');
+// };
+//
+// export const removeToken = () => {
+//   localStorage.removeItem('token');
+// };
 
 // VULNERABILITY #5: Storing user data including sensitive info in localStorage
 export const setUserData = (user) => {

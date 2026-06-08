@@ -7,7 +7,7 @@ import {
   deleteTask,
   searchTasks,
 } from "../services/api";
-import { getUserData, removeToken, clearUserData } from "../utils/storage";
+import { getUserData, clearUserData } from "../utils/storage";
 
 function Dashboard() {
   const [tasks, setTasks] = useState([]);
@@ -87,7 +87,7 @@ function Dashboard() {
   };
 
   const handleLogout = () => {
-    removeToken();
+    // removeToken();
     clearUserData();
     navigate("/login");
   };
