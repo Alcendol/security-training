@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { login } from "../services/api";
-import { setUserData, saveDebugInfo } from "../utils/storage";
+import { setUserData } from "../utils/storage";
 
 function Login({ setAuth }) {
   const [email, setEmail] = useState("");

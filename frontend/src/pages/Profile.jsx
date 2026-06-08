@@ -38,14 +38,23 @@ function Profile() {
       // VULNERABILITY #2: No authorization check - can update any user's profile
       const response = await updateProfile(user.id, formData);
       
-      // VULNERABILITY #5: Updating localStorage with potentially sensitive data
-      setUserData(response.data);
-      setUser(response.data);
+      // Only store non-sensitive user data
+      const updatedUser = {
+        id: response.data.id,
+        name: response.data.name,
+        email: response.data.email,
+        role: response.data.role,
+        bio: response.data.bio,
+      };
+      setUserData(updatedUser);
+      setUser(updatedUser);
       
       setMessage('Profile updated successfully!');
     } catch (error) {
       setMessage('Failed to update profile');
-      console.error('Update error:', error);
+      if (process.env.NODE_ENV === "development") {
+        console.error('Update error:', error);
+      }
     }
   };
 

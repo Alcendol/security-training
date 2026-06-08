@@ -1,50 +1,23 @@
-// VULNERABILITY #5: Insecure storage of sensitive data
+// Secure storage utilities — only store non-sensitive display data
 
-// VULNERABILITY: Storing JWT token in localStorage (vulnerable to XSS)
-// export const setToken = (token) => {
-//   localStorage.setItem('token', token); // Should use httpOnly cookies!
-// };
-//
-// export const getToken = () => {
-//   return localStorage.getItem('token');
-// };
-//
-// export const removeToken = () => {
-//   localStorage.removeItem('token');
-// };
-
-// VULNERABILITY #5: Storing user data including sensitive info in localStorage
+// Store minimal, non-sensitive user data for UI display purposes only
 export const setUserData = (user) => {
-  // Storing full user object including password!
-  localStorage.setItem('user', JSON.stringify(user));
-  
-  // VULNERABILITY: Also storing in sessionStorage
-  sessionStorage.setItem('currentUser', JSON.stringify(user));
+  // Only store non-sensitive fields needed for UI
+  const safeData = {
+    id: user.id,
+    name: user.name,
+    role: user.role,
+  };
+  localStorage.setItem("user", JSON.stringify(safeData));
 };
 
 export const getUserData = () => {
-  const user = localStorage.getItem('user');
+  const user = localStorage.getItem("user");
   return user ? JSON.parse(user) : null;
 };
 
 export const clearUserData = () => {
-  localStorage.removeItem('user');
-  sessionStorage.removeItem('currentUser');
-  
-  // VULNERABILITY: Not clearing all sensitive data
-  // localStorage.clear() would be better, but this leaves traces
-};
-
-// VULNERABILITY #5: Storing sensitive settings in localStorage
-export const saveSettings = (settings) => {
-  localStorage.setItem('appSettings', JSON.stringify(settings));
-};
-
-// VULNERABILITY: Exposing internal debug data
-export const saveDebugInfo = (info) => {
-  localStorage.setItem('debugInfo', JSON.stringify({
-    ...info,
-    timestamp: new Date().toISOString(),
-    userAgent: navigator.userAgent
-  }));
+  // Clear all stored data to prevent data leakage
+  localStorage.clear();
+  sessionStorage.clear();
 };
