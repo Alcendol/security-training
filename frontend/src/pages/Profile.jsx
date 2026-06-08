@@ -110,12 +110,11 @@ function Profile() {
               <label className="block text-gray-700 font-semibold mb-2">
                 Bio
               </label>
-              {/* VULNERABILITY #3: No sanitization - XSS possible in bio field */}
               <textarea
                 name="bio"
                 value={formData.bio}
                 onChange={handleChange}
-                placeholder="Tell us about yourself... (Try: <img src=x onerror=alert('XSS')>)"
+                placeholder="Tell us about yourself..."
                 className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
                 rows="4"
               />
@@ -129,12 +128,10 @@ function Profile() {
             </button>
           </form>
 
-          {/* Display current bio with XSS vulnerability */}
           {user?.bio && (
             <div className="mt-6 p-4 bg-gray-50 rounded">
               <h3 className="font-semibold mb-2">Current Bio:</h3>
-              {/* VULNERABILITY #3: Rendering unsanitized HTML */}
-              <div dangerouslySetInnerHTML={{ __html: user.bio }} />
+              <p className="text-gray-700 whitespace-pre-wrap">{user.bio}</p>
             </div>
           )}
 

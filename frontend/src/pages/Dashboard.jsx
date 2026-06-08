@@ -139,7 +139,7 @@ function Dashboard() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search tasks... (Try: ' OR '1'='1)"
+              placeholder="Search tasks..."
               className="flex-1 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
             />
             <button
@@ -183,13 +183,12 @@ function Dashboard() {
               />
             </div>
             <div>
-              {/* VULNERABILITY #3: No sanitization - XSS possible */}
               <textarea
                 value={newTask.description}
                 onChange={(e) =>
                   setNewTask({ ...newTask, description: e.target.value })
                 }
-                placeholder="Task description (Try: <script>alert('XSS')</script>)"
+                placeholder="Task description"
                 className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
                 rows="3"
               />
