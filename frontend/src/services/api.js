@@ -1,6 +1,6 @@
-import axios from 'axios';
-import { API_BASE_URL, ADMIN_API_KEY } from '../config';
-import { getToken } from '../utils/storage';
+import axios from "axios";
+import { API_BASE_URL } from "../config";
+import { getToken } from "../utils/storage";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -13,48 +13,54 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    
+
     // VULNERABILITY: Logging requests with sensitive data
-    if (console && console.log) {
-      console.log('API Request:', config.method, config.url, config.data);
+    if (process.env.NODE_ENV === "development") {
+      if (console && console.log) {
+        console.log("API Request:", config.method, config.url, config.data);
+      }
     }
-    
+
     return config;
   },
   (error) => {
-    console.error('Request Error:', error);
+    console.error("Request Error:", error);
     return Promise.reject(error);
-  }
+  },
 );
 
 // VULNERABILITY: Logging sensitive response data
 api.interceptors.response.use(
   (response) => {
-    console.log('API Response:', response.data);
+    if (process.env.NODE_ENV === "development") {
+      console.log("API Response:", response.data);
+    }
     return response;
   },
   (error) => {
-    console.error('Response Error:', error.response?.data);
+    if (process.env.NODE_ENV === "development") {
+      console.error("Response Error:", error.response?.data);
+    }
     return Promise.reject(error);
-  }
+  },
 );
 
 // Auth APIs
 export const register = (email, password, name) => {
-  return api.post('/auth/register', { email, password, name });
+  return api.post("/auth/register", { email, password, name });
 };
 
 export const login = (email, password) => {
-  return api.post('/auth/login', { email, password });
+  return api.post("/auth/login", { email, password });
 };
 
 // Task APIs
 export const getTasks = () => {
-  return api.get('/tasks');
+  return api.get("/tasks");
 };
 
 export const createTask = (taskData) => {
-  return api.post('/tasks', taskData);
+  return api.post("/tasks", taskData);
 };
 
 export const updateTask = (id, taskData) => {
@@ -68,12 +74,16 @@ export const deleteTask = (id) => {
 // VULNERABILITY #1: No input sanitization before sending to backend
 export const searchTasks = (searchTerm) => {
   // This will be vulnerable to SQL injection on the backend
-  return api.get(`/tasks/search?q=${searchTerm}`);
+  // return api.get(`/tasks/search?q=${searchTerm}`);
+  return api.get("/tasks/search", {
+    params: { q: searchTerm },
+    // Axios akan encode: /tasks/search?q=hello%26admin%3Dtrue
+  });
 };
 
 // User APIs
 export const getCurrentUser = () => {
-  return api.get('/users/me');
+  return api.get("/users/me");
 };
 
 export const updateProfile = (userId, profileData) => {
@@ -83,10 +93,14 @@ export const updateProfile = (userId, profileData) => {
 // VULNERABILITY #2: Admin endpoint accessible without proper authorization check
 // VULNERABILITY #4: Hardcoded API key sent in request
 export const getAllUsers = () => {
-  return api.get('/admin/users', {
-    headers: {
-      'X-Admin-Key': ADMIN_API_KEY  // Hardcoded admin key!
-    }
+  const role = getUserRole();
+  if (role !== "admin") {
+    return Promise.reject(new Error("Unauthorized"));
+  }
+  return api.get("/admin/users", {
+    // headers: {
+    //   "X-Admin-Key": ADMIN_API_KEY, // Hardcoded admin key!
+    // },
   });
 };
 

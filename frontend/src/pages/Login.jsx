@@ -1,41 +1,49 @@
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { login } from '../services/api';
-import { setToken, setUserData, saveDebugInfo } from '../utils/storage';
+import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { login } from "../services/api";
+import { setToken, setUserData, saveDebugInfo } from "../utils/storage";
 
 function Login({ setAuth }) {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     try {
       const response = await login(email, password);
-      
+
       // VULNERABILITY #5: Storing token in localStorage (vulnerable to XSS)
       setToken(response.data.token);
-      
+
       // VULNERABILITY #5: Storing full user object including password
-      setUserData(response.data.user);
-      
-      // VULNERABILITY: Storing sensitive debug info
-      saveDebugInfo({
-        action: 'login',
-        email: email,
-        timestamp: new Date(),
-        userAgent: navigator.userAgent
+      const user = response.data.user;
+      setUserData({
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
       });
+      // setUserData(response.data.user);
+
+      // VULNERABILITY: Storing sensitive debug info
+      // saveDebugInfo({
+      //   action: 'login',
+      //   email: email,
+      //   timestamp: new Date(),
+      //   userAgent: navigator.userAgent
+      // });
 
       setAuth(true);
-      navigate('/dashboard');
+      navigate("/dashboard");
     } catch (err) {
       // VULNERABILITY: Exposing detailed error messages
-      setError(err.response?.data?.error || 'Login failed');
-      console.error('Login error:', err.response?.data);
+      // setError(err.response?.data?.error || "Login failed");
+      // console.error("Login error:", err.response?.data);
+      setError("Login failed")
     }
   };
 
@@ -44,7 +52,9 @@ function Login({ setAuth }) {
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">SecureTask</h1>
-          <p className="text-red-600 text-sm mt-2">⚠️ Training Project - Contains Vulnerabilities</p>
+          <p className="text-red-600 text-sm mt-2">
+            ⚠️ Training Project - Contains Vulnerabilities
+          </p>
         </div>
 
         <h2 className="text-2xl font-semibold mb-6 text-center">Login</h2>
