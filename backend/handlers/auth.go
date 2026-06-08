@@ -1,22 +1,52 @@
 package handlers
 
 import (
+	"fmt"
+	"html"
+	"log"
 	"net/http"
+	"os"
 	"securetask/database"
 	"securetask/models"
 	"time"
+	"unicode"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
 )
 
-// VULNERABILITY #4: Hardcoded JWT secret
-var jwtSecret = []byte("supersecret123")
+// jwtSecret is loaded once from the environment at startup.
+var jwtSecret []byte
+
+func LoadJWTSecret() {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		log.Fatal("JWT_SECRET environment variable must be set")
+	}
+	if len(secret) < 32 {
+		log.Fatal("JWT_SECRET must be at least 32 characters long")
+	}
+	jwtSecret = []byte(secret)
+}
 
 type RegisterRequest struct {
 	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required"`
-	Name     string `json:"name" binding:"required"`
+	Password string `json:"password" binding:"required,min=8,max=72"`
+	Name     string `json:"name" binding:"required,max=100"`
+}
+
+func isStrongPassword(pw string) bool {
+	var hasLetter, hasDigit bool
+	for _, r := range pw {
+		switch {
+		case unicode.IsLetter(r):
+			hasLetter = true
+		case unicode.IsDigit(r):
+			hasDigit = true
+		}
+	}
+	return hasLetter && hasDigit
 }
 
 type LoginRequest struct {
@@ -24,19 +54,35 @@ type LoginRequest struct {
 	Password string `json:"password" binding:"required"`
 }
 
-// VULNERABILITY #2: No input validation, no password strength requirements
 func Register(c *gin.Context) {
 	var req RegisterRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": formatValidationError(err)})
 		return
 	}
 
-	// VULNERABILITY #5: Password stored in plain text (no hashing!)
+	if !isStrongPassword(req.Password) {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Password must contain at least one letter and one number"})
+		return
+	}
+
+	var existing models.User
+	if err := database.DB.Where("email = ?", req.Email).First(&existing).Error; err == nil {
+		c.JSON(http.StatusConflict, gin.H{"error": "Email is already registered"})
+		return
+	}
+
+	// Hash password with bcrypt before storing
+	hashed, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to process password"})
+		return
+	}
+
 	user := models.User{
 		Email:    req.Email,
-		Password: req.Password, // Should be hashed with bcrypt!
-		Name:     req.Name,
+		Password: string(hashed),
+		Name:     html.EscapeString(req.Name),
 		Role:     "user",
 	}
 
@@ -45,25 +91,29 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// VULNERABILITY #2: Returning password in response
+	// Return only safe fields — Password is excluded by json:"-" on the model
 	c.JSON(http.StatusCreated, gin.H{
 		"message": "User registered successfully",
-		"user":    user, // Contains password!
+		"user":    user,
 	})
 }
 
-// VULNERABILITY #2: No rate limiting - vulnerable to brute force attacks
 func Login(c *gin.Context) {
 	var req LoginRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": formatValidationError(err)})
 		return
 	}
 
 	var user models.User
+	if err := database.DB.Where("email = ?", req.Email).First(&user).Error; err != nil {
+		// Use a generic message to avoid user enumeration
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
+		return
+	}
 
-	// VULNERABILITY #5: Plain text password comparison
-	if err := database.DB.Where("email = ? AND password = ?", req.Email, req.Password).First(&user).Error; err != nil {
+	// Compare submitted password against bcrypt hash
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
@@ -82,10 +132,10 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// VULNERABILITY #2: Returning sensitive user data including password
+	// Password is excluded by json:"-" on the model
 	c.JSON(http.StatusOK, gin.H{
 		"token": tokenString,
-		"user":  user, // Contains password!
+		"user":  user,
 	})
 }
 
@@ -104,6 +154,9 @@ func AuthMiddleware() gin.HandlerFunc {
 		}
 
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+				return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
+			}
 			return jwtSecret, nil
 		})
 

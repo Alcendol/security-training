@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"fmt"
+	"html"
 	"net/http"
 	"securetask/database"
 	"securetask/models"
@@ -10,9 +10,16 @@ import (
 )
 
 type CreateTaskRequest struct {
-	Title       string `json:"title" binding:"required"`
-	Description string `json:"description"`
-	Priority    string `json:"priority"`
+	Title       string `json:"title" binding:"required,max=200"`
+	Description string `json:"description" binding:"max=2000"`
+	Priority    string `json:"priority" binding:"omitempty,oneof=low medium high"`
+}
+
+type UpdateTaskRequest struct {
+	Title       *string `json:"title" binding:"omitempty,max=200"`
+	Description *string `json:"description" binding:"omitempty,max=2000"`
+	Priority    *string `json:"priority" binding:"omitempty,oneof=low medium high"`
+	Status      *string `json:"status" binding:"omitempty,oneof=todo in_progress done"`
 }
 
 func GetTasks(c *gin.Context) {
@@ -24,20 +31,18 @@ func GetTasks(c *gin.Context) {
 	c.JSON(http.StatusOK, tasks)
 }
 
-// VULNERABILITY #2: No input validation or sanitization
 func CreateTask(c *gin.Context) {
 	var req CreateTaskRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": formatValidationError(err)})
 		return
 	}
 
 	userID := c.GetUint("user_id")
 
-	// VULNERABILITY #3: No sanitization - XSS possible through description
 	task := models.Task{
-		Title:       req.Title,       // No sanitization
-		Description: req.Description, // XSS vulnerability!
+		Title:       html.EscapeString(req.Title),
+		Description: html.EscapeString(req.Description),
 		Priority:    req.Priority,
 		Status:      "todo",
 		UserID:      userID,
@@ -61,26 +66,42 @@ func UpdateTask(c *gin.Context) {
 		return
 	}
 
-	// VULNERABILITY #2: No input validation
-	var updates map[string]interface{}
-	if err := c.ShouldBindJSON(&updates); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	var req UpdateTaskRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": formatValidationError(err)})
 		return
 	}
 
-	// VULNERABILITY #3: No sanitization on updated fields
+	updates := map[string]interface{}{}
+	if req.Title != nil {
+		updates["title"] = html.EscapeString(*req.Title)
+	}
+	if req.Description != nil {
+		updates["description"] = html.EscapeString(*req.Description)
+	}
+	if req.Priority != nil {
+		updates["priority"] = *req.Priority
+	}
+	if req.Status != nil {
+		updates["status"] = *req.Status
+	}
+
 	database.DB.Model(&task).Updates(updates)
 
 	c.JSON(http.StatusOK, task)
 }
 
-// VULNERABILITY #2: No authentication required (exposed publicly in main.go)
-// VULNERABILITY #2: No authorization check
 func DeleteTask(c *gin.Context) {
 	taskID := c.Param("id")
+	userID := c.GetUint("user_id")
 
-	// Anyone can delete any task!
-	if err := database.DB.Delete(&models.Task{}, taskID).Error; err != nil {
+	var task models.Task
+	if err := database.DB.Where("id = ? AND user_id = ?", taskID, userID).First(&task).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Task not found"})
+		return
+	}
+
+	if err := database.DB.Delete(&task).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete task"})
 		return
 	}
@@ -88,8 +109,6 @@ func DeleteTask(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"message": "Task deleted"})
 }
 
-// VULNERABILITY #1: SQL Injection in search functionality
-// VULNERABILITY #2: No authentication required (exposed publicly in main.go)
 func SearchTasks(c *gin.Context) {
 	searchTerm := c.Query("q")
 
@@ -98,15 +117,16 @@ func SearchTasks(c *gin.Context) {
 		return
 	}
 
-	// VULNERABILITY #1: Direct string concatenation - SQL INJECTION!
-	query := fmt.Sprintf("SELECT * FROM tasks WHERE title LIKE '%%%s%%' OR description LIKE '%%%s%%'", searchTerm, searchTerm)
+	userID := c.GetUint("user_id")
+	pattern := "%" + searchTerm + "%"
 
-	// Using raw SQL without parameterization
-	results, err := database.ExecuteRawSQL(query)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Search failed", "details": err.Error()})
+	var tasks []models.Task
+	if err := database.DB.
+		Where("user_id = ? AND (title ILIKE ? OR description ILIKE ?)", userID, pattern, pattern).
+		Find(&tasks).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Search failed"})
 		return
 	}
 
-	c.JSON(http.StatusOK, results)
+	c.JSON(http.StatusOK, tasks)
 }

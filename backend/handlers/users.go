@@ -1,12 +1,19 @@
 package handlers
 
 import (
+	"html"
 	"net/http"
 	"securetask/database"
 	"securetask/models"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
+
+type UpdateProfileRequest struct {
+	Name *string `json:"name" binding:"omitempty,max=100"`
+	Bio  *string `json:"bio" binding:"omitempty,max=500"`
+}
 
 func GetCurrentUser(c *gin.Context) {
 	userID := c.GetUint("user_id")
@@ -17,29 +24,41 @@ func GetCurrentUser(c *gin.Context) {
 		return
 	}
 
-	// VULNERABILITY #2: Returning password in response
+	// Password is excluded from the response by json:"-" on the User model
 	c.JSON(http.StatusOK, user)
 }
 
-// VULNERABILITY #2: No authentication required (exposed publicly in main.go)
-// VULNERABILITY #2: No authorization check - can update any user's profile
 func UpdateProfile(c *gin.Context) {
-	userID := c.Param("id")
-
-	var updates map[string]interface{}
-	if err := c.ShouldBindJSON(&updates); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	targetID, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid user id"})
 		return
 	}
 
-	// VULNERABILITY #2: Anyone can update anyone's profile!
-	// No check if the authenticated user matches the profile being updated
+	userID := c.GetUint("user_id")
+	if uint(targetID) != userID {
+		c.JSON(http.StatusForbidden, gin.H{"error": "You can only update your own profile"})
+		return
+	}
 
-	// VULNERABILITY #3: Bio field not sanitized - XSS vulnerability
+	var req UpdateProfileRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": formatValidationError(err)})
+		return
+	}
+
 	var user models.User
 	if err := database.DB.First(&user, userID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
 		return
+	}
+
+	updates := map[string]interface{}{}
+	if req.Name != nil {
+		updates["name"] = html.EscapeString(*req.Name)
+	}
+	if req.Bio != nil {
+		updates["bio"] = html.EscapeString(*req.Bio)
 	}
 
 	database.DB.Model(&user).Updates(updates)
@@ -47,15 +66,16 @@ func UpdateProfile(c *gin.Context) {
 	c.JSON(http.StatusOK, user)
 }
 
-// VULNERABILITY #2: No authentication required (exposed publicly in main.go)
-// VULNERABILITY #2: No authorization check - anyone can access admin endpoint
 func GetAllUsers(c *gin.Context) {
-	// Should check if user has admin role, but doesn't!
+	if c.GetString("role") != "admin" {
+		c.JSON(http.StatusForbidden, gin.H{"error": "Admin access required"})
+		return
+	}
 
 	var users []models.User
 	database.DB.Find(&users)
 
-	// VULNERABILITY #2: Returning all users with passwords!
+	// Password is excluded from the response by json:"-" on the User model
 	c.JSON(http.StatusOK, gin.H{
 		"users": users,
 		"count": len(users),

@@ -3,6 +3,7 @@ package database
 import (
 	"fmt"
 	"log"
+	"os"
 
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
@@ -10,10 +11,24 @@ import (
 
 var DB *gorm.DB
 
-// VULNERABILITY #4: Hardcoded database credentials
 func Connect() {
-	// These credentials should come from environment variables!
-	dsn := "host=localhost user=taskuser password=taskpass123 dbname=securetask port=5432 sslmode=disable"
+	host := os.Getenv("DB_HOST")
+	port := os.Getenv("DB_PORT")
+	user := os.Getenv("DB_USER")
+	password := os.Getenv("DB_PASSWORD")
+	dbname := os.Getenv("DB_NAME")
+
+	if host == "" || user == "" || password == "" || dbname == "" {
+		log.Fatal("Database environment variables (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME) must be set")
+	}
+	if port == "" {
+		port = "5432"
+	}
+
+	dsn := fmt.Sprintf(
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+		host, user, password, dbname, port,
+	)
 
 	var err error
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
@@ -25,11 +40,10 @@ func Connect() {
 }
 
 // VULNERABILITY #1: Raw SQL execution without parameterization
-func ExecuteRawSQL(query string) ([]map[string]interface{}, error) {
+func ExecuteRawSQL(query string, args ...interface{}) ([]map[string]interface{}, error) {
 	var results []map[string]interface{}
 
-	// This allows SQL injection!
-	rows, err := DB.Raw(query).Rows()
+	rows, err := DB.Raw(query, args...).Rows()
 	if err != nil {
 		return nil, err
 	}
