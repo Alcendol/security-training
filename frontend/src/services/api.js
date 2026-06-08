@@ -6,21 +6,12 @@ const api = axios.create({
   withCredentials: true,
 });
 
-// VULNERABILITY: Logging sensitive data
+// Request interceptor — only log in development
 api.interceptors.request.use(
   (config) => {
-    // const token = getToken();
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
-
-    // VULNERABILITY: Logging requests with sensitive data
     if (process.env.NODE_ENV === "development") {
-      if (console && console.log) {
-        console.log("API Request:", config.method, config.url, config.data);
-      }
+      console.log("API Request:", config.method, config.url);
     }
-
     return config;
   },
   (error) => {
@@ -31,17 +22,14 @@ api.interceptors.request.use(
   },
 );
 
-// VULNERABILITY: Logging sensitive response data
+// Response interceptor — only log in development
 api.interceptors.response.use(
   (response) => {
-    if (process.env.NODE_ENV === "development") {
-      console.log("API Response:", response.data);
-    }
     return response;
   },
   (error) => {
     if (process.env.NODE_ENV === "development") {
-      console.error("Response Error:", error.response?.data);
+      console.error("Response Error:", error.response?.status);
     }
     return Promise.reject(error);
   },
@@ -73,13 +61,10 @@ export const deleteTask = (id) => {
   return api.delete(`/tasks/${id}`);
 };
 
-// VULNERABILITY #1: No input sanitization before sending to backend
+// Search with parameterized query (safe from injection)
 export const searchTasks = (searchTerm) => {
-  // This will be vulnerable to SQL injection on the backend
-  // return api.get(`/tasks/search?q=${searchTerm}`);
   return api.get("/tasks/search", {
     params: { q: searchTerm },
-    // Axios akan encode: /tasks/search?q=hello%26admin%3Dtrue
   });
 };
 
@@ -92,18 +77,9 @@ export const updateProfile = (userId, profileData) => {
   return api.put(`/users/${userId}/profile`, profileData);
 };
 
-// VULNERABILITY #2: Admin endpoint accessible without proper authorization check
-// VULNERABILITY #4: Hardcoded API key sent in request
+// Admin endpoint — server-side authorization enforced
 export const getAllUsers = () => {
-  // const role = getUserRole();
-  // if (role !== "admin") {
-  //   return Promise.reject(new Error("Unauthorized"));
-  // }
-  return api.get("/admin/users", {
-    // headers: {
-    //   "X-Admin-Key": ADMIN_API_KEY, // Hardcoded admin key!
-    // },
-  });
+  return api.get("/admin/users");
 };
 
 export default api;

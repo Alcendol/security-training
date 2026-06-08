@@ -10,21 +10,12 @@ import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import AdminPanel from "./pages/AdminPanel";
+import { getCurrentUser } from "./services/api";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Check if user is authenticated
-    // const token = getToken();
-    // const user = getUserData();
-
-    // VULNERABILITY: Weak authentication check
-    // Only checks if token exists, doesn't validate it
-    // if (token && user) {
-    //   setIsAuthenticated(true);
-    // }
-
     const checkAuth = async () => {
       try {
         await getCurrentUser();
@@ -36,8 +27,6 @@ function App() {
     checkAuth();
   }, []);
 
-  // VULNERABILITY: No CSP (Content Security Policy) headers
-  // VULNERABILITY: No protection against clickjacking
 
   return (
     <Router>

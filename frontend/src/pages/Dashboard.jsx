@@ -67,7 +67,6 @@ function Dashboard() {
     }
   };
 
-  // VULNERABILITY #1: No sanitization before sending search query (SQL Injection on backend)
   const handleSearch = async (e) => {
     e.preventDefault();
     try {
@@ -79,15 +78,11 @@ function Dashboard() {
       if (process.env.NODE_ENV === "development") {
         console.error("Search failed:", error);
       }
-      // alert(
-      //   "Search failed: " + (error.response?.data?.error || "Unknown error"),
-      // );
       setError("Pencarian gagal. Coba lagi.");
     }
   };
 
   const handleLogout = () => {
-    // removeToken();
     clearUserData();
     navigate("/login");
   };
@@ -100,14 +95,10 @@ function Dashboard() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
               <h1 className="text-xl font-bold text-gray-900">SecureTask</h1>
-              <span className="ml-4 text-sm text-red-600">
-                ⚠️ Vulnerable Training App
-              </span>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-gray-700">
-                {/* VULNERABILITY #5: Displaying sensitive user data from localStorage */}
-                Welcome, {user?.name} {/* ({user?.email}) */ }
+                Welcome, {user?.name}
               </span>
               <Link to="/profile" className="text-blue-500 hover:underline">
                 Profile
@@ -139,7 +130,7 @@ function Dashboard() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search tasks... (Try: ' OR '1'='1)"
+              placeholder="Search tasks..."
               className="flex-1 px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
             />
             <button
@@ -183,13 +174,12 @@ function Dashboard() {
               />
             </div>
             <div>
-              {/* VULNERABILITY #3: No sanitization - XSS possible */}
               <textarea
                 value={newTask.description}
                 onChange={(e) =>
                   setNewTask({ ...newTask, description: e.target.value })
                 }
-                placeholder="Task description (Try: <script>alert('XSS')</script>)"
+                placeholder="Task description"
                 className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
                 rows="3"
               />
@@ -233,11 +223,6 @@ function Dashboard() {
                       <h3 className="text-lg font-semibold text-gray-900">
                         {task.title}
                       </h3>
-                      {/* VULNERABILITY #3: Rendering unsanitized HTML - XSS attack vector! */}
-                      {/* <div  */}
-                      {/*   className="text-gray-600 mt-2" */}
-                      {/*   dangerouslySetInnerHTML={{ __html: task.description }} */}
-                      {/* /> */}
                       <p className="text-gray-600 mt-2">{task.description}</p>
                       <div className="mt-2 flex gap-2">
                         <span

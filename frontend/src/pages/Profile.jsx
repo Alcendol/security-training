@@ -35,17 +35,25 @@ function Profile() {
     setMessage('');
 
     try {
-      // VULNERABILITY #2: No authorization check - can update any user's profile
       const response = await updateProfile(user.id, formData);
       
-      // VULNERABILITY #5: Updating localStorage with potentially sensitive data
-      setUserData(response.data);
-      setUser(response.data);
+      // Only store non-sensitive user data
+      const updatedUser = {
+        id: response.data.id,
+        name: response.data.name,
+        email: response.data.email,
+        role: response.data.role,
+        bio: response.data.bio,
+      };
+      setUserData(updatedUser);
+      setUser(updatedUser);
       
       setMessage('Profile updated successfully!');
     } catch (error) {
       setMessage('Failed to update profile');
-      console.error('Update error:', error);
+      if (process.env.NODE_ENV === "development") {
+        console.error('Update error:', error);
+      }
     }
   };
 
@@ -110,12 +118,11 @@ function Profile() {
               <label className="block text-gray-700 font-semibold mb-2">
                 Bio
               </label>
-              {/* VULNERABILITY #3: No sanitization - XSS possible in bio field */}
               <textarea
                 name="bio"
                 value={formData.bio}
                 onChange={handleChange}
-                placeholder="Tell us about yourself... (Try: <img src=x onerror=alert('XSS')>)"
+                placeholder="Tell us about yourself..."
                 className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-blue-500"
                 rows="4"
               />
@@ -129,22 +136,13 @@ function Profile() {
             </button>
           </form>
 
-          {/* Display current bio with XSS vulnerability */}
           {user?.bio && (
             <div className="mt-6 p-4 bg-gray-50 rounded">
               <h3 className="font-semibold mb-2">Current Bio:</h3>
-              {/* VULNERABILITY #3: Rendering unsanitized HTML */}
-              <div dangerouslySetInnerHTML={{ __html: user.bio }} />
+              <p className="text-gray-700 whitespace-pre-wrap">{user.bio}</p>
             </div>
           )}
 
-          {/* VULNERABILITY #5: Exposing sensitive data in UI */}
-          <div className="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded">
-            <h3 className="font-semibold mb-2 text-yellow-800">Debug Info (Should be removed in production!):</h3>
-            <pre className="text-xs overflow-auto">
-              {JSON.stringify(user, null, 2)}
-            </pre>
-          </div>
         </div>
       </div>
     </div>
