@@ -100,9 +100,6 @@ function Dashboard() {
           <div className="flex justify-between h-16 items-center">
             <div className="flex items-center">
               <h1 className="text-xl font-bold text-gray-900">SecureTask</h1>
-              <span className="ml-4 text-sm text-red-600">
-                ⚠️ Vulnerable Training App
-              </span>
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-gray-700">

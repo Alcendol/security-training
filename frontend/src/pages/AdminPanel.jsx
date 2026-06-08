@@ -32,7 +32,9 @@ function AdminPanel() {
       setUsers(response.data.users);
     } catch (err) {
       setError("Failed to load users");
-      console.error("Error loading users:", err);
+      if (process.env.NODE_ENV === "development") {
+        console.error("Error loading users:", err);
+      }
     }
   };
 
@@ -123,20 +125,7 @@ function AdminPanel() {
             </table>
           </div>
 
-          <div className="mt-6 p-4 bg-red-50 border border-red-200 rounded">
-            <h3 className="font-semibold text-red-800 mb-2">
-              🚨 Security Issues on This Page:
-            </h3>
-            <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
-              <li>
-                No server-side authorization check - anyone can access this
-                endpoint
-              </li>
-              <li>Passwords are visible in plain text</li>
-              <li>Client-side role check can be bypassed</li>
-              <li>Sensitive user data exposed without proper access control</li>
-            </ul>
-          </div>
+
         </div>
       </div>
     </div>

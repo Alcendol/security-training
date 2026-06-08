@@ -52,9 +52,6 @@ function Login({ setAuth }) {
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">SecureTask</h1>
-          <p className="text-red-600 text-sm mt-2">
-            ⚠️ Training Project - Contains Vulnerabilities
-          </p>
         </div>
 
         <h2 className="text-2xl font-semibold mb-6 text-center">Login</h2>

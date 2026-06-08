@@ -36,8 +36,10 @@ function Register() {
       }, 2000);
     } catch (err) {
       // VULNERABILITY: Exposing detailed error information
-      setError(err.response?.data?.error || 'Registration failed');
-      console.error('Registration error:', err);
+      setError('Registration failed');
+      if (process.env.NODE_ENV === "development") {
+        console.error('Registration error:', err);
+      }
     }
   };
 
@@ -46,7 +48,9 @@ function Register() {
       <div className="max-w-md w-full bg-white rounded-lg shadow-md p-8">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">SecureTask</h1>
-          <p className="text-red-600 text-sm mt-2">⚠️ Training Project - Contains Vulnerabilities</p>
+          <p className="text-red-600 text-sm mt-2">
+            ⚠️ Training Project
+          </p>
         </div>
 
         <h2 className="text-2xl font-semibold mb-6 text-center">Register</h2>
