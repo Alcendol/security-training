@@ -40,7 +40,7 @@ securetask/
 # Start PostgreSQL database
 docker-compose up -d
 
-# Database will be available at localhost:5432
+# Database will be available at localhost:5433
 # Database: securetask
 # User: taskuser
 # Password: taskpass123
