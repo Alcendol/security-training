@@ -74,14 +74,15 @@ All user accounts, especially accounts with weak or reused passwords.
 
 **Justification**: The endpoint is public and easy to automate. Impact depends on password strength and monitoring.
 
-<!-- ### Recommendation
-Add rate limiting and failed-attempt controls to authentication endpoints.
+### Recommendation
+Add brute-force protection to the login endpoint. The developer fix list confirms password requirements were improved, but it does not show a completed rate-limiting or account-lockout fix, so this recommendation remains open until repeated failed login attempts are throttled.
 
 **Suggested Actions**:
 1. Rate limit login attempts by IP and account identifier.
 2. Add temporary lockout or progressive delay after repeated failures.
 3. Monitor failed login attempts.
-4. Enforce stronger password requirements. -->
+4. Return generic authentication errors that do not reveal whether the email exists.
+5. Keep automated and manual regression tests for repeated failed login attempts.
 
 ### References
 - OWASP Authentication Cheat Sheet

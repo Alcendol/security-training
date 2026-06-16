@@ -2,7 +2,7 @@
 
 **Report Date**: 2026-06-15  
 **Tester Name**: Devy Relliani | dsaffiya@PMINTL.NET
-**Project**: SecureTask Security Training  
+**Project**: SecureTask Security Training
 
 ---
 
@@ -90,15 +90,15 @@ All task records in the database are potentially exposed. Other database data ma
 
 **Justification**: The payload is simple, unauthenticated, and directly reaches raw SQL execution. The impact includes unauthorized data access and possible database manipulation.
 
-<!-- ### Recommendation
-Use parameterized queries or GORM query builders for all database access. Remove direct string interpolation from SQL statements, require authentication on search, and scope search results by authenticated user.
+### Recommendation
+Keep the search remediation aligned with the backend fix documented by developers: search must be authenticated, scoped to the logged-in user, and implemented with parameterized database queries. User input must never be concatenated into SQL, and any raw SQL helper must not be reachable with untrusted input.
 
 **Suggested Actions**:
-1. Replace raw concatenated SQL with parameterized query methods.
-2. Require authentication for the search endpoint.
-3. Add user ownership filtering to search results.
-4. Return generic errors instead of SQL details.
-5. Add regression tests for common SQL injection payloads. -->
+1. Keep `GET /api/tasks/search` inside the authenticated API route group.
+2. Query tasks with parameter binding/placeholders instead of string interpolation.
+3. Filter results by the authenticated user's `user_id`.
+4. Return generic search errors without SQL or database details.
+5. Add regression tests for tautology, comment, union, time-based, and malformed SQL payloads.
 
 ### References
 - OWASP SQL Injection: https://owasp.org/www-community/attacks/SQL_Injection

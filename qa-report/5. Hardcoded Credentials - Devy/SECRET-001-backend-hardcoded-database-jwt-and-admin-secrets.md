@@ -67,13 +67,14 @@ All application users and database records.
 **Justification**: Secrets are directly readable in source files and control authentication and database access.
 
 ### Recommendation
-Move secrets to environment variables and remove committed `.env` files from real projects. Rotate all exposed values.
+Keep backend secrets out of source code and load sensitive configuration from environment variables. This aligns with the developer fixes that moved database and JWT configuration to environment variables, required a stronger JWT secret, and hashed seeded passwords. For a real project, any `.env` file that was committed should be removed from version control history and all exposed values should be rotated.
 
 **Suggested Actions**:
-1. Load database and JWT configuration from environment variables.
-2. Provide `.env.example` with placeholder values only.
-3. Add `.env` to `.gitignore` in non-training projects.
-4. Rotate database passwords and JWT secrets after removal.
+1. Keep database and JWT configuration loaded from environment variables.
+2. Keep `.env` ignored and provide `.env.example` with placeholder values only.
+3. Remove committed `.env` files from real project history.
+4. Rotate database passwords, JWT secrets, and any exposed admin keys after removal.
+5. Verify source searches no longer find hardcoded DB connection strings, weak JWT secrets, or admin keys.
 
 ### References
 - OWASP Top 10 A05: Security Misconfiguration

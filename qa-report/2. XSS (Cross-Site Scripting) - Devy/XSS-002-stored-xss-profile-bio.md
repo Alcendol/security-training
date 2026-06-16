@@ -68,14 +68,16 @@ Any user viewing a malicious profile bio. Because profile update is not protecte
 
 **Justification**: The vulnerable field is stored and rendered unsafely. The profile update endpoint further increases exploitability.
 
-<!-- ### Recommendation
-Render profile bios as plain text or sanitize before rendering. Protect profile updates with authentication and ownership checks.
+### Recommendation
+Keep profile bios rendered as safe text and protect profile updates with authentication and ownership checks. This aligns with the developer fixes that replaced `dangerouslySetInnerHTML`, added profile input validation/escaping, and restricted profile updates to the logged-in owner.
 
 **Suggested Actions**:
-1. Remove raw HTML rendering for bio content.
-2. Sanitize any allowed HTML with a trusted sanitizer.
-3. Validate bio length and allowed content server-side.
-4. Require authentication and ownership checks for profile updates. -->
+1. Render bio content as plain text by default.
+2. If formatted bio content is ever allowed, sanitize it with a strict allowlist before rendering.
+3. Validate profile `name` and `bio` length server-side.
+4. Require authentication for profile updates.
+5. Enforce ownership checks so users can update only their own profile.
+6. Keep regression tests for `<img onerror>`, `<svg onload>`, and `javascript:` link payloads.
 
 ### References
 - OWASP Cross Site Scripting Prevention Cheat Sheet

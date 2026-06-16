@@ -71,14 +71,15 @@ Any user who views a malicious task description is affected.
 
 **Justification**: The payload is stored and automatically rendered. Impact is high because authentication tokens are accessible to JavaScript.
 
-<!-- ### Recommendation
-Avoid rendering user content as HTML. If HTML formatting is required, sanitize it with a trusted sanitizer and enforce a Content Security Policy.
+### Recommendation
+Keep task descriptions rendered as safe text and validate/sanitize task input before storage. This aligns with the developer fixes that removed raw HTML rendering in the Dashboard and added backend validation/escaping for task fields.
 
 **Suggested Actions**:
-1. Render task descriptions as text by default.
-2. Sanitize any allowed HTML before rendering.
-3. Add backend validation for task fields.
-4. Add XSS regression tests for event handler payloads. -->
+1. Render task titles and descriptions as plain text by default.
+2. If rich text is ever required, sanitize it with a trusted allowlist-based sanitizer before rendering.
+3. Validate task title, description, priority, and status server-side.
+4. Escape or sanitize stored task text so event-handler payloads become harmless text.
+5. Keep XSS regression tests for `<img onerror>`, `<svg onload>`, event handlers, and `javascript:` URLs.
 
 ### References
 - OWASP Cross Site Scripting Prevention Cheat Sheet

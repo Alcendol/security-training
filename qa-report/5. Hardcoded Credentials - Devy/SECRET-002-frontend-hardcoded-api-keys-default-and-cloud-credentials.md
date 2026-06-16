@@ -68,13 +68,14 @@ Application users and any services represented by exposed keys.
 **Justification**: Frontend secrets are exposed to all users by design. The impact depends on whether the values are real or reused.
 
 ### Recommendation
-Remove secrets from frontend code. Use backend-controlled secrets and environment-specific public configuration only.
+Keep secrets out of frontend source and browser bundles. This aligns with the developer fixes that removed the hardcoded admin API key, default credentials, debug flag, and AWS-like values from `config.js`, and moved the API base URL to Vite environment configuration.
 
 **Suggested Actions**:
 1. Remove hardcoded admin keys and cloud credentials from frontend code.
 2. Move sensitive operations behind authenticated backend endpoints.
 3. Use `import.meta.env.VITE_*` only for non-sensitive public configuration.
 4. Remove default password display from production-like UI.
+5. Retest both source files and built browser assets for credential-like strings.
 
 ### References
 - CWE-798: Use of Hard-coded Credentials

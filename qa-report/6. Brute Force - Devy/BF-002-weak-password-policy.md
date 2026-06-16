@@ -70,13 +70,14 @@ All accounts created with weak passwords.
 **Justification**: Weak passwords are easy to create and the login endpoint has no brute force protection.
 
 ### Recommendation
-Enforce password length and quality requirements server-side, with matching frontend guidance.
+Enforce password length and quality requirements server-side, with matching frontend guidance. This aligns with the developer fixes that added backend minimum length and letter/number checks, plus frontend password-strength feedback and submit blocking for weak passwords.
 
 **Suggested Actions**:
-1. Require a reasonable minimum password length.
-2. Reject common or known-compromised passwords where practical.
-3. Add frontend validation hints for user experience.
-4. Keep final validation on the backend.
+1. Keep backend validation as the final authority for password acceptance.
+2. Keep frontend password guidance consistent with backend rules.
+3. Reject short passwords and passwords without both letters and numbers.
+4. Consider rejecting common or known-compromised passwords where practical.
+5. Retest short, common, numeric-only, letter-only, and valid strong passwords.
 
 ### References
 - OWASP Authentication Cheat Sheet

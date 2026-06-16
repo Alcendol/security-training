@@ -66,14 +66,15 @@ All users of the web application.
 
 **Justification**: The application already has stored XSS paths. CSP absence increases exploit reliability but is a secondary control.
 
-<!-- ### Recommendation
-Define a CSP that restricts scripts, objects, frames, and other resource sources. Tune the policy for Vite development and production separately.
+### Recommendation
+Keep a restrictive Content Security Policy in place as defense in depth for XSS. This aligns with the developer fix that added CSP, MIME-sniffing protection, and referrer policy metadata to the frontend entry page.
 
 **Suggested Actions**:
-1. Add a CSP header or meta tag.
-2. Avoid unsafe inline scripts.
-3. Block object embedding and restrict frame ancestors.
-4. Verify CSP does not break legitimate app behavior. -->
+1. Define CSP through an HTTP response header or a meta tag.
+2. Restrict script sources to trusted origins and avoid unsafe inline scripts where possible.
+3. Restrict frame ancestors to prevent clickjacking.
+4. Limit `connect-src` to the frontend origin and trusted backend API.
+5. Verify the policy in browser DevTools and confirm it does not break legitimate Vite/frontend behavior.
 
 ### References
 - MDN Content Security Policy
