@@ -53,6 +53,9 @@ func CreateTask(c *gin.Context) {
 		return
 	}
 
+	// Reload with the associated User so the response matches GET /tasks.
+	database.DB.Preload("User").First(&task, task.ID)
+
 	c.JSON(http.StatusCreated, task)
 }
 
@@ -87,6 +90,9 @@ func UpdateTask(c *gin.Context) {
 	}
 
 	database.DB.Model(&task).Updates(updates)
+
+	// Reload with the associated User so the response matches GET /tasks.
+	database.DB.Preload("User").First(&task, task.ID)
 
 	c.JSON(http.StatusOK, task)
 }
@@ -123,6 +129,7 @@ func SearchTasks(c *gin.Context) {
 	var tasks []models.Task
 	if err := database.DB.
 		Where("user_id = ? AND (title ILIKE ? OR description ILIKE ?)", userID, pattern, pattern).
+		Preload("User").
 		Find(&tasks).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Search failed"})
 		return
