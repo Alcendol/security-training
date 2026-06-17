@@ -4,16 +4,18 @@ services:
   postgres:
     image: postgres:15-alpine
     container_name: securetask-db
+    env_file:
+      - backend/.env
     environment:
-      POSTGRES_USER: taskuser
-      POSTGRES_PASSWORD: taskpass123
-      POSTGRES_DB: securetask
+      POSTGRES_USER: ${DB_USER:-taskuser}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      POSTGRES_DB: ${DB_NAME:-securetask}
     ports:
-      - "5433:5432"
+      - "${DB_PORT:-5433}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U taskuser -d securetask"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-taskuser} -d ${DB_NAME:-securetask}"]
       interval: 10s
       timeout: 5s
       retries: 5
