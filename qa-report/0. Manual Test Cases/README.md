@@ -28,6 +28,7 @@
 | `04-insecure-data-storage-manual-test-cases.md` | `STORE-001` through `STORE-004` |
 | `05-hardcoded-credentials-manual-test-cases.md` | `SECRET-001`, `SECRET-002` |
 | `06-brute-force-manual-test-cases.md` | `BF-001`, `BF-002` |
+| `07-developer-fix-verification-tests.md` | Additional regression checks from developer fix documentation |
 
 ## Environment Notes
 
