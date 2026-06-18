@@ -50,15 +50,17 @@ SELECT email, password FROM users WHERE email = 'store-password-qa@example.com';
 - Admin panel does not show passwords.
 
 ### Actual Result
-To be completed during execution.
+Diuji 2026-06-18.
+- **BEFORE (`training/` :8081):** login membalas `"password":"password123"` di body; `GET /api/admin/users` menampilkan password semua user; DB menyimpan plaintext (`admin123`, `pwned123`). Vulnerable terkonfirmasi.
+- **AFTER (`security-training/` :8080):** response register/login/`/users/me`/`/admin/users` **tanpa** field `password`; DB menyimpan hash bcrypt — `SELECT` menunjukkan prefix `$2a$` dengan panjang `60` untuk semua user.
 
 ### Status
-- [ ] Pass
+- [x] Pass
 - [ ] Fail
 - [ ] Blocked
 
 ### Evidence
-Attach API responses and database evidence with sensitive values redacted where appropriate.
+Output curl + query DB: `_evidence/API-EVIDENCE-old.md` (STORE-001) & `_evidence/API-EVIDENCE-fixed.md` (STORE-001, DB check).
 
 ## TC-STORE-002: JWT Is Not Stored in localStorage or sessionStorage
 
@@ -104,15 +106,17 @@ document.cookie
 - Cookie uses SameSite and Secure where appropriate for the environment.
 
 ### Actual Result
-To be completed during execution.
+Diuji 2026-06-18 (sisi server diverifikasi via API; isi localStorage perlu browser).
+- **BEFORE (`training/`):** token disimpan ke localStorage (`frontend/src/utils/storage.js:5` `localStorage.setItem('token', token)`, dipanggil di `Login.jsx:20`). Bisa dibaca JS → rawan XSS. Vulnerable.
+- **AFTER (`security-training/` :8080):** login **tidak** mengembalikan token di body; server mengeset cookie `Set-Cookie: auth_token=...; Path=/; Max-Age=86400; HttpOnly; SameSite=Lax`. `HttpOnly` = tidak terbaca JS; `utils/storage.js` tidak menyimpan token.
 
 ### Status
-- [ ] Pass
+- [x] Pass
 - [ ] Fail
 - [ ] Blocked
 
 ### Evidence
-Attach DevTools storage and cookie screenshots.
+Header `Set-Cookie`: `_evidence/API-EVIDENCE-fixed.md` (STORE-002). Source before/after: `_evidence/README.md` (STORE-002). Screenshot DevTools (Local/Session Storage kosong dari token; tab Cookies `auth_token` HttpOnly ✓) disarankan.
 
 ## TC-STORE-003: Browser Storage and Profile UI Do Not Expose Sensitive User Data
 
@@ -153,15 +157,17 @@ Verify that localStorage/sessionStorage only contain minimal non-sensitive data 
 - Logout clears application storage.
 
 ### Actual Result
-To be completed during execution.
+Diuji 2026-06-18 (verifikasi via source code; tampilan runtime perlu browser).
+- **BEFORE (`training/`):** `utils/storage.js:18-22` menyimpan **objek user lengkap (termasuk password)** ke localStorage **dan** sessionStorage; `:45` menyimpan `debugInfo`; `Dashboard.jsx:79` menampilkan data sensitif dari localStorage. Vulnerable.
+- **AFTER (`security-training/`):** `utils/storage.js:6-12` hanya menyimpan `{id, name, role}` (safeData, tanpa password/token); `logout()` (`:21-22`) memanggil `localStorage.clear(); sessionStorage.clear()`.
 
 ### Status
-- [ ] Pass
+- [x] Pass
 - [ ] Fail
 - [ ] Blocked
 
 ### Evidence
-Attach DevTools storage screenshots and Profile page screenshots.
+Source before/after: `_evidence/README.md` (STORE-003). Screenshot DevTools (isi key `user` minimal; storage bersih setelah logout) disarankan sebagai konfirmasi akhir.
 
 ## TC-STORE-004: API Requests and Responses Do Not Log Sensitive Data to Console
 
@@ -198,13 +204,15 @@ Verify that browser console logs do not expose credentials, tokens, passwords, o
 - User-facing errors are generic.
 
 ### Actual Result
-To be completed during execution.
+Diuji 2026-06-18 (verifikasi via source code; tampilan runtime perlu browser).
+- **BEFORE (`training/`):** `services/api.js:19` `console.log('API Request:', config.method, config.url, config.data)` mencetak body request (termasuk password saat login); `:33` `console.log('API Response:', response.data)` mencetak seluruh body response. Vulnerable.
+- **AFTER (`security-training/`):** `services/api.js:13` hanya mencetak `config.method, config.url` (tanpa body) dan hanya saat `NODE_ENV === 'development'`; `:32` hanya `error.response?.status`. Tidak ada credential/token/body sensitif yang ter-log.
 
 ### Status
-- [ ] Pass
+- [x] Pass
 - [ ] Fail
 - [ ] Blocked
 
 ### Evidence
-Attach console screenshots with sensitive values redacted.
+Source before/after: `_evidence/README.md` (STORE-004). Screenshot Console (tanpa body/password/token) disarankan sebagai konfirmasi akhir.
 

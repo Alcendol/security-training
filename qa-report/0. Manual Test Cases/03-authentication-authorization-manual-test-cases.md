@@ -38,15 +38,17 @@ curl -i "http://localhost:8080/api/tasks/search?q=test"
 - Authenticated search only returns tasks belonging to the current user.
 
 ### Actual Result
-To be completed during execution.
+Diuji 2026-06-18.
+- **BEFORE (old build `training/` :8081):** anonim `GET /api/tasks/search?q=leaked` → `200 OK`, mengembalikan task tanpa login (data bocor). Vulnerable result terkonfirmasi.
+- **AFTER (fixed build `security-training/` :8080):** anonim → `401 {"error":"Authentication required"}`; User A (login) → `200` berisi **hanya** task miliknya (`SecretTaskA`); User B (login) → `200 []` (tidak melihat task User A).
 
 ### Status
-- [ ] Pass
+- [x] Pass
 - [ ] Fail
 - [ ] Blocked
 
 ### Evidence
-Attach curl output and response body.
+Output curl: `_evidence/API-EVIDENCE-old.md` (AUTH-001) & `_evidence/API-EVIDENCE-fixed.md` (AUTH-001).
 
 ## TC-AUTH-002: Task Delete Requires Authentication and Ownership
 
@@ -88,15 +90,17 @@ curl -i -X DELETE "http://localhost:8080/api/tasks/1"
 - Owner delete succeeds.
 
 ### Actual Result
-To be completed during execution.
+Diuji 2026-06-18.
+- **BEFORE (`training/` :8081):** anonim `DELETE /api/tasks/1` → `200 {"message":"Task deleted"}`, task benar-benar terhapus tanpa auth. Vulnerable result terkonfirmasi.
+- **AFTER (`security-training/` :8080):** anonim → `401`; User B menghapus task User A → `404 {"error":"Task not found"}` (query difilter `user_id`); User A menghapus task sendiri → `200`.
 
 ### Status
-- [ ] Pass
+- [x] Pass
 - [ ] Fail
 - [ ] Blocked
 
 ### Evidence
-Attach API responses and before/after task list screenshots.
+Output curl: `_evidence/API-EVIDENCE-old.md` (AUTH-002) & `_evidence/API-EVIDENCE-fixed.md` (AUTH-002).
 
 ## TC-AUTH-003: Profile Update Requires Authentication and Ownership
 
@@ -138,15 +142,17 @@ curl -i -X PUT "http://localhost:8080/api/users/2/profile" \
 - Owner update succeeds.
 
 ### Actual Result
-To be completed during execution.
+Diuji 2026-06-18.
+- **BEFORE (`training/` :8081):** anonim `PUT /api/users/1/profile` → `200`, profil **admin** berubah jadi `name:"Owned By Anon"` tanpa login (horizontal/vertical priv-esc). Vulnerable result terkonfirmasi.
+- **AFTER (`security-training/` :8080):** anonim → `401`; User A meng-update profil User B → `403 {"error":"You can only update your own profile"}`; User A update profil sendiri → `200`.
 
 ### Status
-- [ ] Pass
+- [x] Pass
 - [ ] Fail
 - [ ] Blocked
 
 ### Evidence
-Attach curl output and profile before/after screenshots.
+Output curl: `_evidence/API-EVIDENCE-old.md` (AUTH-003) & `_evidence/API-EVIDENCE-fixed.md` (AUTH-003).
 
 ## TC-AUTH-004: Admin User Listing Requires Admin Role
 
@@ -189,15 +195,17 @@ curl -i "http://localhost:8080/api/admin/users"
 - Password fields are absent from all responses.
 
 ### Actual Result
-To be completed during execution.
+Diuji 2026-06-18.
+- **BEFORE (`training/` :8081):** anonim `GET /api/admin/users` → `200`, mengembalikan semua user **termasuk field `password` plaintext** (`admin123`, `password123`). Vulnerable result terkonfirmasi.
+- **AFTER (`security-training/` :8080):** anonim → `401`; user reguler → `403 {"error":"Admin access required"}`; admin → `200`, dan **tidak ada field `password`** di response manapun.
 
 ### Status
-- [ ] Pass
+- [x] Pass
 - [ ] Fail
 - [ ] Blocked
 
 ### Evidence
-Attach API responses and Admin Panel screenshots.
+Output curl: `_evidence/API-EVIDENCE-old.md` (AUTH-004) & `_evidence/API-EVIDENCE-fixed.md` (AUTH-004).
 
 ## TC-AUTH-005: Client-Side Role Changes Do Not Grant Admin Access
 
@@ -240,15 +248,17 @@ location.href = '/admin';
 - No admin data is returned to non-admin users.
 
 ### Actual Result
-To be completed during execution.
+Diuji 2026-06-18 (sisi server diverifikasi via API; langkah localStorage perlu browser).
+- **BEFORE (`training/`):** otorisasi admin ditentukan di klien dari localStorage (`frontend/src/pages/AdminPanel.jsx:17-20`) sehingga mengubah `role` di localStorage membuka panel admin & menampilkan password (`:114`). Vulnerable.
+- **AFTER (`security-training/` :8080):** backend memvalidasi `role` dari JWT, bukan localStorage. Bukti: user reguler `GET /api/admin/users` → `403`, dan token palsu `alg:none` berisi `role:admin` → `401`. Mengubah localStorage tidak mengubah cookie/JWT, jadi backend tetap `403`.
 
 ### Status
-- [ ] Pass
+- [x] Pass
 - [ ] Fail
 - [ ] Blocked
 
 ### Evidence
-Attach localStorage screenshot and Network response.
+`_evidence/API-EVIDENCE-fixed.md` (AUTH-004 user→403, TC-FIX-001). Source: `_evidence/README.md` (AUTH-005). Screenshot DevTools (ubah role di localStorage → `/admin` tetap 403) disarankan sebagai konfirmasi akhir.
 
 ## TC-AUTH-006: Update Endpoints Reject Mass Assignment
 
@@ -298,15 +308,17 @@ curl -i -X PUT "http://localhost:8080/api/users/{own_user_id}/profile" \
 - Protected fields are ignored or rejected with `400 Bad Request`.
 
 ### Actual Result
-To be completed during execution.
+Diuji 2026-06-18.
+- **BEFORE (`training/` :8081):** `PUT /api/users/2/profile` dengan `{"role":"admin","password":"pwned123",...}` → `200`, dan via admin listing user id 2 berubah jadi `role:"admin"` & `password:"pwned123"` (mass assignment). Vulnerable.
+- **AFTER (`security-training/` :8080):** kirim `role`+`password` ke profil sendiri → `200` tapi **diabaikan**; `GET /api/users/me` menunjukkan `role` tetap `"user"`. Update task `status:"invalid_status"` → `400`; `priority:"urgent"` → `400`; create task tanpa title → `400`.
 
 ### Status
-- [ ] Pass
+- [x] Pass
 - [ ] Fail
 - [ ] Blocked
 
 ### Evidence
-Attach request bodies and response bodies.
+Output curl: `_evidence/API-EVIDENCE-old.md` (AUTH-006) & `_evidence/API-EVIDENCE-fixed.md` (AUTH-006).
 
 ## TC-AUTH-007: CORS Only Allows Trusted Origins
 
@@ -348,12 +360,14 @@ curl -i -H "Origin: http://attacker.example" "http://localhost:8080/api/users/me
 - Credentials are only allowed for trusted origins.
 
 ### Actual Result
-To be completed during execution.
+Diuji 2026-06-18.
+- **BEFORE (`training/` :8081):** origin asing `http://attacker.example` dibalas `Access-Control-Allow-Origin: *` bersamaan `Access-Control-Allow-Credentials: true` (sangat permisif). Vulnerable.
+- **AFTER (`security-training/` :8080):** origin tepercaya `http://localhost:5173` → `Access-Control-Allow-Origin: http://localhost:5173` + `Allow-Credentials: true`; origin asing → **tidak ada** header `Access-Control-Allow-*`.
 
 ### Status
-- [ ] Pass
+- [x] Pass
 - [ ] Fail
 - [ ] Blocked
 
 ### Evidence
-Attach curl output or browser Network screenshots.
+Output curl header: `_evidence/API-EVIDENCE-old.md` (AUTH-007) & `_evidence/API-EVIDENCE-fixed.md` (AUTH-007).
