@@ -34,6 +34,6 @@ logs/
 *.sqlite
 
 # Environment variables — NEVER commit secrets to version control
-.env
+backend/.env
 .env.*
 !.env.example
