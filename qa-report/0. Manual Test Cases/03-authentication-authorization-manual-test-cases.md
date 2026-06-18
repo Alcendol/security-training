@@ -58,6 +58,13 @@ Diuji 2026-06-18.
 
 Output curl: `_evidence/API-EVIDENCE-old.md` (AUTH-001) & `_evidence/API-EVIDENCE-fixed.md` (AUTH-001).
 
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-001/{3B1F9ABD-E8B7-43E0-A61C-871EB5A52B51}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-001/{C719E99B-83FC-430E-8662-5037A863644A}.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
+
 ![alt text](evidence/03/{FD40F051-AD1E-40E5-90C1-3858D1F29734}.png)
 ![alt text](evidence/03/{48BF79BE-B782-4E08-83D2-DC50808F0914}.png)
 
@@ -121,6 +128,16 @@ Diuji 2026-06-18.
 
 Output curl: `_evidence/API-EVIDENCE-old.md` (AUTH-002) & `_evidence/API-EVIDENCE-fixed.md` (AUTH-002).
 
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-002/{ADFB4287-9877-4AA4-ABBE-0DA61280E775}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-002/{25974A3E-D777-4358-8F9E-B70072B82F09}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-002/{16B41EA7-4F6E-4E2B-AB42-F5F32B2DA41C}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-002/{7A7E4B26-8821-4323-9DF9-F897B8CF8390}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-002/{3AE7BEE8-8F08-443F-826F-EB3215A11ABC}.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
+
 ![alt text](evidence/03/{4EC13AB8-C6C2-4058-84AD-408FC59B7325}.png)
 ![alt text](evidence/03/{DAA064BD-EF6E-462E-BC92-BEC560D7D913}.png)
 
@@ -183,6 +200,16 @@ Diuji 2026-06-18.
 ### Evidence
 
 Output curl: `_evidence/API-EVIDENCE-old.md` (AUTH-003) & `_evidence/API-EVIDENCE-fixed.md` (AUTH-003).
+
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-003/{C9BB9AD3-F83D-49C4-BE74-343D1A841FD4}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-003/{6243334D-395B-488E-B20C-F00A91B7DF0B}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-003/{A93B96E7-F174-48EE-A1B4-2164F2F84259}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-003/{2867CA34-65B1-4F4C-B88B-FCFD804E3395}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-003/{F9F543B9-D31E-44D0-ABAF-38EA4D2A8465}.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
 
 ![alt text](evidence/03/{A51E279B-45B5-46AE-80E8-0E9C6C5EAC4E}.png)
 ![alt text](evidence/03/{1ECA50CC-1B95-4E61-A16B-44EC72DA65C2}.png)
@@ -248,6 +275,14 @@ Diuji 2026-06-18.
 
 Output curl: `_evidence/API-EVIDENCE-old.md` (AUTH-004) & `_evidence/API-EVIDENCE-fixed.md` (AUTH-004).
 
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-004/{043C66AF-F97A-4899-AE0B-4CA395731788}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-004/{7BB9F65E-AFE4-4224-B694-2F6C8FC87FAE}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-004/{BE922926-0268-49A0-ADB0-76576C52EDC1}.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
+
 ![alt text](evidence/03/{AA4412D0-9160-436D-B003-2936C17C3E9A}.png)
 ![alt text](evidence/03/{6EF587B3-5EC1-4D8D-8A0D-6B5DCFADA1D4}.png)
 ![alt text](evidence/03/{715A4DBB-E269-4F7F-83A6-798A890DBF71}.png)
@@ -312,6 +347,16 @@ Diuji 2026-06-18 (sisi server diverifikasi via API; langkah localStorage perlu b
 ### Evidence
 
 `_evidence/API-EVIDENCE-fixed.md` (AUTH-004 user→403, TC-FIX-001). Source: `_evidence/README.md` (AUTH-005).
+
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-005/{0990FAF9-D961-4439-9F1B-6B1195FD4AB4}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-005/{4C8CA246-41B1-4096-B2FD-A14702C3B32D}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-005/{DA94DCFC-9C2F-44CD-94BC-99BD8F2CB7BD}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-005/{3278510D-4BE8-4FB4-974D-51991E863F81}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-005/{11C67115-3EA9-4E11-82FC-C1F19C51700F}.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
 
 ![alt text](evidence/03/{572A0FC6-6F50-4C9E-8016-17771F5D06E9}.png)
 
@@ -383,6 +428,15 @@ Diuji 2026-06-18.
 
 Output curl: `_evidence/API-EVIDENCE-old.md` (AUTH-006) & `_evidence/API-EVIDENCE-fixed.md` (AUTH-006).
 
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-006/{7F60D62E-04F0-4E6D-B6A8-58F1C1902C11}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-006/{EB080FA4-9144-419E-9F61-5E3AB8226021}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-006/{8DBB2B36-449E-42DD-AE6B-8FEE76D9A511}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-006/{501FDBCD-6B44-429F-8755-84E04F91AB16}.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
+
 ![alt text](evidence/03/{F212DE23-10A0-43F4-A89F-EFD2AC2B6A18}.png)
 ![alt text](evidence/03/{A1013110-3D3D-49F5-A9AA-16BDE5506500}.png)
 
@@ -445,5 +499,14 @@ Diuji 2026-06-18.
 ### Evidence
 
 Output curl header: `_evidence/API-EVIDENCE-old.md` (AUTH-007) & `_evidence/API-EVIDENCE-fixed.md` (AUTH-007).
+
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-007/{2FCB0AFF-C95D-4AD3-9A6D-2F1C1E1B98E3}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-007/{689C9380-3FA9-42EF-A14D-1C16FC72AFBE}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-007/{34482A06-69E0-4C67-B6E8-34D77FE6CE96}.png)
+![alt text](../3.%20Authentication%20%26%20Authorization%20-%20Sadam/evidence/auth-007/{55391F08-FC97-4D6B-8AFE-9CCA032F1B0A}.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
 
 ![alt text](evidence/03/{0ACCABE1-5E23-450E-A660-468286D9E355}.png)

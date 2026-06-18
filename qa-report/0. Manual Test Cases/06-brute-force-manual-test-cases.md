@@ -67,6 +67,13 @@ Diuji 2026-06-19.
 
 ### Evidence
 
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../6.%20Brute%20Force%20-%20Devy/image.png)
+![alt text](../6.%20Brute%20Force%20-%20Devy/image-2.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
+
 ![alt text](evidence/06/{B7CD6837-DC33-45A1-B517-09B89E7E6E5A}.png)
 ![alt text](evidence/06/{911B850C-0DF1-4CF3-8143-02AD1954FAD1}.png)
 
@@ -142,6 +149,13 @@ Diuji 2026-06-19.
 - [ ] Blocked
 
 ### Evidence
+
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../6.%20Brute%20Force%20-%20Devy/image-1.png)
+![alt text](../6.%20Brute%20Force%20-%20Devy/image-3.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
 
 ![alt text](evidence/06/{0F6C86AB-10E1-4CAB-A7BF-245B0BE6B3E9}.png)
 ![alt text](evidence/06/{C545359B-F74C-4A47-ABFA-6E45A31C8DEA}.png)

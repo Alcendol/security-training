@@ -70,6 +70,15 @@ Diuji 2026-06-18.
 
 Output curl + query DB: `_evidence/API-EVIDENCE-old.md` (STORE-001) & `_evidence/API-EVIDENCE-fixed.md` (STORE-001, DB check).
 
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-001/{94679A4A-5AB4-449A-A1F4-FB13F8066AED}.png)
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-001/{AEB89F3D-D769-4C63-AB50-2406D6AC84BD}.png)
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-001/{B6BE1BC0-0A6E-4A4C-9E35-E5B997181187}.png)
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-001/{1C34899F-437F-4363-B16F-0F68972C44AD}.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
+
 ![alt text](evidence/04/{78644CA4-897B-4242-9664-3C5EE45ED342}.png)
 ![alt text](evidence/04/{C51B7490-0BBA-4EDA-96E3-35DFE7766A94}.png)
 ![alt text](evidence/04/{A51387BB-4F1A-47CF-A50D-4ED2347AADED}.png)
@@ -138,6 +147,17 @@ Diuji 2026-06-18 (sisi server diverifikasi via API; isi localStorage perlu brows
 
 Header `Set-Cookie`: `_evidence/API-EVIDENCE-fixed.md` (STORE-002). Source before/after: `_evidence/README.md` (STORE-002).
 
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-002/{132AAD18-48CE-4FB6-AC2E-A4824830DD5A}.png)
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-002/{7EF7A6CB-A4E3-43EE-B857-49FB20F7D521}.png)
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-002/{3E0C4EF9-4F6F-4871-90E9-49FDB836CA1D}.png)
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-002/{97A785BF-35AA-45DF-B145-4FEDAE0D301E}.png)
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-002/{5A34C2D4-6863-4F98-AE60-838DEEE72C3E}.png)
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-002/{C1D31DED-0E1F-4BFF-965C-F2DD086C6D24}.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
+
 ![alt text](evidence/04/{00CD0922-4D60-46D3-91EC-670E483AE908}.png)
 ![alt text](evidence/04/{EF482168-C685-4921-9F53-E9585501CA15}.png)
 ![alt text](evidence/04/{7CB9E61F-1F25-46BC-9B20-90868A8885E9}.png)
@@ -202,6 +222,17 @@ Diuji 2026-06-18 (verifikasi via source code; tampilan runtime perlu browser).
 
 Source before/after: `_evidence/README.md` (STORE-003).
 
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-003/{69EE57A6-23D0-4C07-9B3F-8C8EF2AFF8DF}.png)
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-003/{56BEC049-3647-402B-AA5F-A78974A8A7EC}.png)
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-003/{9B14575F-33E4-456F-BD88-7556EAC4698D}.png)
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-003/{7F6B2B23-4745-4501-B361-E0DF6DC83667}.png)
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-003/{C1FE1C56-80CD-481D-B68C-DE4E7902638B}.png)
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-003/{65E72944-BFF2-4E3A-8BF5-45B6C1123D30}.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
+
 ![alt text](evidence/04/{025F18C7-9B00-4FD4-ADDA-2FC2480BCBBB}.png)
 ![alt text](evidence/04/{80D8D2C5-63FB-4D0D-90A8-0C10A09A2449}.png)
 ![alt text](evidence/04/{B6680258-7131-4A52-AE1C-135549AA65A5}.png)
@@ -261,6 +292,15 @@ Diuji 2026-06-18 (verifikasi via source code; tampilan runtime perlu browser).
 ### Evidence
 
 Source before/after: `_evidence/README.md` (STORE-004).
+
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-004/{28653AB5-BC0B-48D5-9CB2-D6757C360819}.png)
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-004/{011614E8-8100-48D1-B7AA-5AD120FDF124}.png)
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-004/{B6C03B9F-1901-4E5D-97F3-96EDF343F280}.png)
+![alt text](../4.%20Insecure%20Data%20Storage%20-%20Sadam/evidence/store-004/{F5B0A652-4B18-4692-8493-ED7F4BAA9561}.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
 
 ![alt text](evidence/04/{14BF6AF1-AE3E-480A-9728-B8236A494DD9}.png)
 ![alt text](evidence/04/{0554ACD7-0E5C-46CA-AA3F-A63512D93121}.png)

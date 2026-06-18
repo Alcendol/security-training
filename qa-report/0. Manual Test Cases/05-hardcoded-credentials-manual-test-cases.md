@@ -77,6 +77,13 @@ Diuji 2026-06-19.
 
 ### Evidence
 
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../5.%20Hardcoded%20Credentials%20-%20Devy/image.png)
+![alt text](../5.%20Hardcoded%20Credentials%20-%20Devy/image-1.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
+
 ![alt text](evidence/05/{8F358090-1084-4D48-B634-DA4D75257712}.png)
 ![alt text](evidence/05/{30F1CEA6-D8AD-4ACD-8F49-3EE749716F38}.png)
 
@@ -153,6 +160,13 @@ Diuji 2026-06-19.
 - [ ] Blocked
 
 ### Evidence
+
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../5.%20Hardcoded%20Credentials%20-%20Devy/image-3.png)
+![alt text](../5.%20Hardcoded%20Credentials%20-%20Devy/image-2.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
 
 ![alt text](evidence/05/{5C1379EB-775C-4BB6-8CFD-F5EFC9B57FDB}.png)
 ![alt text](evidence/05/{03433CD2-53C8-4C01-9E2C-D7933CEE3166}.png)

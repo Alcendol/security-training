@@ -65,6 +65,13 @@ Diuji 2026-06-19.
 
 ### Evidence
 
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../2.%20XSS%20(Cross-Site%20Scripting)%20-%20Devy/Screenshot%202026-06-16%20084503.png)
+![alt text](../2.%20XSS%20(Cross-Site%20Scripting)%20-%20Devy/Screenshot%202026-06-16%20084508.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
+
 ![alt text](evidence/02/{069AABCF-E2E7-49DF-87F8-0964FD40EAAE}.png)
 ![alt text](evidence/02/{89039AD5-A367-497E-A9F4-08BE97B0AE07}.png)
 ![alt text](evidence/02/{BFC2DF21-C5EF-48F5-B1BE-1E30169D8435}.png)
@@ -142,6 +149,12 @@ Diuji 2026-06-19.
 
 ### Evidence
 
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../2.%20XSS%20(Cross-Site%20Scripting)%20-%20Devy/image.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
+
 ![alt text](evidence/02/{E3060AA0-9588-4458-A349-724079E84F05}.png)
 ![alt text](evidence/02/{E82F51E6-CCDC-4FAB-985A-DD8C14E48FD6}.png)
 ![alt text](evidence/02/{50E1380A-79D1-4D5D-AC6A-6D0D486AB1E4}.png)
@@ -207,6 +220,12 @@ Diuji 2026-06-19.
 - [ ] Blocked
 
 ### Evidence
+
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../2.%20XSS%20(Cross-Site%20Scripting)%20-%20Devy/image-1.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
 
 ![alt text](evidence/02/{9F424518-A2BF-4248-AC29-402E8BDF3E62}.png)
 ![alt text](evidence/02/{173799B0-AC99-4131-AA59-A4438396BA36}.png)

@@ -1,0 +1,68 @@
+
+═══════════════════════════════════════════════════════════════
+  SecureTask Automated Security Test Results
+  Date: 2026-06-18T19:37:19.165Z
+  API base URL: http://localhost:8080/api
+  Frontend URL: http://localhost:5173
+═══════════════════════════════════════════════════════════════
+
+[FAIL] API-BF-001           Login throttles repeated failures
+      no throttling observed: 401, 401, 401, 401, 401, 401, 401, 401, 401, 401, 401, 401, 401, 401, 401, 401, 401, 401, 401, 401
+[PASS] API-AUTH-001         Task search rejects anonymous requests
+      Anonymous search returned 401
+[PASS] API-AUTH-002         Task delete rejects anonymous requests
+      Anonymous delete returned 401
+[PASS] API-AUTH-003         Profile update rejects anonymous and cross-user requests
+      Anonymous and cross-user profile updates are rejected
+[PASS] API-AUTH-004         Admin users endpoint rejects anonymous and regular users
+      Admin endpoint rejects anonymous and regular users
+[PASS] API-AUTH-005         Regular user cannot access admin endpoint even with manipulated role
+      Regular user correctly receives 403 from admin endpoint
+[PASS] API-AUTH-006         Profile update rejects mass assignment
+      Protected fields were not updated through profile endpoint
+[PASS] API-AUTH-007         CORS rejects untrusted origins
+      Untrusted origin did not receive permissive CORS header
+[PASS] API-BF-002           Weak registration password is rejected
+      Weak password returned 400
+[PASS] API-SETUP            Create isolated QA users
+      Created users qa-auto-a-1781811437612-7429@example.com and qa-auto-b-1781811437612-7429@example.com
+[PASS] API-SQL-001          Task search SQL injection payload returns no unrelated tasks
+      Injection payload did not return unrelated task or SQL errors
+[PASS] API-STORE-001        Auth API responses do not expose passwords
+      Register and current-user responses hide password fields
+[PASS] API-STORE-002        Login sets httpOnly auth cookie and no token body
+      Login uses HttpOnly cookie without token body
+[PASS] API-STORE-003        Login response does not return sensitive user fields
+      User endpoint returns only safe fields
+[PASS] API-XSS-001          Task description XSS payload is stored safely (React escapes on render)
+      XSS payload stored as text in JSON response; React escapes on render (STATIC-XSS-001 confirms no dangerouslySetInnerHTML)
+[PASS] API-XSS-002          Profile bio XSS payload is stored safely (React escapes on render)
+      XSS payload stored as text in JSON response; React escapes on render
+[PASS] STATIC-AUTH-005      Admin authorization uses backend JWT role, not client storage
+      AdminPanel does not gate on localStorage role
+[PASS] STATIC-AUTH-007      Backend CORS is not AllowAllOrigins
+      CORS uses explicit origins
+[PASS] STATIC-BF-002        Registration has server-side password requirements
+      Server-side password length and strength checks found
+[PASS] STATIC-SECRET-001    Backend secrets are not hardcoded in tracked config
+      No known backend secret patterns found
+[PASS] STATIC-SECRET-002    Frontend source does not expose credentials or cloud-like secrets
+      No frontend hardcoded credential patterns found
+[PASS] STATIC-SQL-001       Search code avoids raw SQL interpolation
+      SearchTasks uses user-scoped parameterized query shape
+[PASS] STATIC-STORE-001     User passwords are excluded and bcrypt is used
+      Password JSON exclusion and bcrypt usage found
+[PASS] STATIC-STORE-002     Frontend does not store JWT tokens in web storage
+      No token writes to localStorage/sessionStorage found
+[PASS] STATIC-STORE-003     Frontend stores only safe user fields
+      storage.js stores only safe user fields
+[PASS] STATIC-STORE-004     Frontend does not log sensitive API bodies
+      No sensitive interceptor body logging found
+[PASS] STATIC-XSS-001       Frontend avoids dangerouslySetInnerHTML
+      No dangerouslySetInnerHTML usage found in frontend/src
+[PASS] STATIC-XSS-003       Frontend defines a Content Security Policy
+      CSP meta tag found
+
+───────────────────────────────────────────────────────────────
+  TOTAL: 28 tests | 27 pass | 1 fail | 0 skip
+───────────────────────────────────────────────────────────────

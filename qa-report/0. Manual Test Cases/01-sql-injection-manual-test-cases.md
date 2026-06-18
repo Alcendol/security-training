@@ -82,6 +82,18 @@ Diuji 2026-06-19.
 
 ### Evidence
 
+**BEFORE (Vulnerable — `training/` :8081):**
+
+![alt text](../1.%20SQL%20Injection%20-%20Devy/image.png)
+![alt text](../1.%20SQL%20Injection%20-%20Devy/image-1.png)
+![alt text](../1.%20SQL%20Injection%20-%20Devy/image-2.png)
+![alt text](../1.%20SQL%20Injection%20-%20Devy/image-3.png)
+![alt text](../1.%20SQL%20Injection%20-%20Devy/image-5.png)
+![alt text](../1.%20SQL%20Injection%20-%20Devy/image-6.png)
+![alt text](../1.%20SQL%20Injection%20-%20Devy/image-4.png)
+
+**AFTER (Fixed — `security-training/` :8080):**
+
 ![alt text](evidence/01/{0789EA54-0C2C-42F7-8471-A210713E1A9C}.png)
 ![alt text](evidence/01/{2EFD0202-8012-490B-9BF1-C084D6321612}.png)
 ![alt text](evidence/01/{2F90F3E1-D1C5-410D-AA52-5D128DDE8D54}.png)

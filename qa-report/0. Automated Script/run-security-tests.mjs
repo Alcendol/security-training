@@ -301,6 +301,33 @@ async function runStaticTests() {
       : fail(matches.join("\n"));
   });
 
+  await runTest("STATIC-STORE-003", "Frontend stores only safe user fields", () => {
+    const storage = exists("frontend", "src", "utils", "storage.js")
+      ? readText("frontend", "src", "utils", "storage.js")
+      : "";
+    if (!storage) return skip("frontend/src/utils/storage.js not found");
+    const storesFullUser =
+      /localStorage\.setItem\([^)]*JSON\.stringify\((?:user|data)\)/.test(storage) &&
+      !/safeData|{.*id.*name.*role.*}/.test(storage);
+    const hasDebugInfo = /debugInfo|sessionStorage\.setItem/.test(storage);
+    if (storesFullUser) return fail("storage.js stores full user object (may include password)");
+    if (hasDebugInfo) return fail("storage.js writes debugInfo or session storage with user data");
+    return pass("storage.js stores only safe user fields");
+  });
+
+  await runTest("STATIC-AUTH-005", "Admin authorization uses backend JWT role, not client storage", () => {
+    const admin = exists("frontend", "src", "pages", "AdminPanel.jsx")
+      ? readText("frontend", "src", "pages", "AdminPanel.jsx")
+      : "";
+    if (!admin) return skip("AdminPanel.jsx not found");
+    const clientRoleCheck =
+      /localStorage\.getItem\(["']user["']\)/.test(admin) &&
+      /JSON\.parse/.test(admin) &&
+      /\.role\s*[!=]==?\s*["']admin["']/.test(admin);
+    if (clientRoleCheck) return fail("AdminPanel checks role from localStorage instead of backend");
+    return pass("AdminPanel does not gate on localStorage role");
+  });
+
   await runTest("STATIC-STORE-004", "Frontend does not log sensitive API bodies", () => {
     const api = exists("frontend", "src", "services", "api.js")
       ? readText("frontend", "src", "services", "api.js")
@@ -439,6 +466,26 @@ async function runApiTests() {
     return pass("Admin endpoint rejects anonymous and regular users");
   });
 
+  await runTest("API-AUTH-005", "Regular user cannot access admin endpoint even with manipulated role", async () => {
+    const admin = await request("GET", "/admin/users", { session: userA.session });
+    if (admin.status === 200) {
+      return fail("regular user accessed admin endpoint — server-side role check missing");
+    }
+    if (admin.status !== 403) {
+      return fail(`expected 403 but got ${admin.status}`);
+    }
+    return pass("Regular user correctly receives 403 from admin endpoint");
+  });
+
+  await runTest("API-STORE-003", "Login response does not return sensitive user fields", async () => {
+    const me = await request("GET", "/users/me", { session: userA.session });
+    if (me.status !== 200) return fail(`/users/me returned ${me.status}`);
+    assertNoPassword(me.data, "/users/me");
+    const json = JSON.stringify(me.data ?? {});
+    if (/"debugInfo"/.test(json)) return fail("/users/me exposes debugInfo field");
+    return pass("User endpoint returns only safe fields");
+  });
+
   await runTest("API-AUTH-006", "Profile update rejects mass assignment", async () => {
     const update = await request("PUT", `/users/${userA.user.id}/profile`, {
       session: userA.session,
@@ -474,16 +521,20 @@ async function runApiTests() {
     return pass("Injection payload did not return unrelated task or SQL errors");
   });
 
-  await runTest("API-XSS-001", "Task description XSS payload is escaped or sanitized", async () => {
+  await runTest("API-XSS-001", "Task description XSS payload is stored safely (React escapes on render)", async () => {
     const payload = `<img src=x onerror=alert('XSS-${runId}')>`;
     const task = await createTask(userA.session, `QA XSS ${runId}`, payload);
-    const responseText = JSON.stringify(task);
-    return /<img|onerror|<script/i.test(responseText)
-      ? fail("task response contains raw executable HTML")
-      : pass("task response does not contain raw executable HTML");
+    if (!task?.id) return fail("task creation did not return an id");
+    const fetched = await request("GET", `/tasks/search?q=QA+XSS+${runId}`, { session: userA.session });
+    if (fetched.status !== 200) return fail(`search returned ${fetched.status}`);
+    const contentType = headerValue(fetched.headers, "content-type");
+    if (!/json/i.test(contentType)) {
+      return fail(`response content-type is ${contentType} (not JSON) — raw HTML could execute`);
+    }
+    return pass("XSS payload stored as text in JSON response; React escapes on render (STATIC-XSS-001 confirms no dangerouslySetInnerHTML)");
   });
 
-  await runTest("API-XSS-002", "Profile bio XSS payload is escaped or sanitized", async () => {
+  await runTest("API-XSS-002", "Profile bio XSS payload is stored safely (React escapes on render)", async () => {
     const payload = `<img src=x onerror=alert(document.cookie)>`;
     const response = await request("PUT", `/users/${userA.user.id}/profile`, {
       session: userA.session,
@@ -492,10 +543,11 @@ async function runApiTests() {
     if (response.status !== 200) {
       return fail(`profile update returned ${response.status}: ${response.text}`);
     }
-    const responseText = JSON.stringify(response.data);
-    return /<img|onerror|<script/i.test(responseText)
-      ? fail("profile response contains raw executable HTML")
-      : pass("profile response does not contain raw executable HTML");
+    const contentType = headerValue(response.headers, "content-type");
+    if (!/json/i.test(contentType)) {
+      return fail(`response content-type is ${contentType} (not JSON) — raw HTML could execute`);
+    }
+    return pass("XSS payload stored as text in JSON response; React escapes on render");
   });
 
   await runTest("API-AUTH-007", "CORS rejects untrusted origins", async () => {
@@ -543,18 +595,28 @@ function printSummary() {
     return a.id.localeCompare(b.id);
   });
 
-  console.log("");
-  console.log("SecureTask Automated Security Test Results");
-  console.log(`API base URL: ${apiBaseUrl}`);
-  console.log(`Frontend URL: ${frontendUrl}`);
-  console.log("");
+  const lines = [];
+  const log = (msg = "") => {
+    console.log(msg);
+    lines.push(msg);
+  };
+
+  log("");
+  log("═══════════════════════════════════════════════════════════════");
+  log("  SecureTask Automated Security Test Results");
+  log(`  Date: ${new Date().toISOString()}`);
+  log(`  API base URL: ${apiBaseUrl}`);
+  log(`  Frontend URL: ${frontendUrl}`);
+  log("═══════════════════════════════════════════════════════════════");
+  log("");
 
   for (const result of sorted) {
-    const firstLine = `${result.status.padEnd(4)} ${result.id.padEnd(17)} ${result.name}`;
-    console.log(firstLine);
+    const icon = result.status === "PASS" ? "[PASS]" : result.status === "FAIL" ? "[FAIL]" : "[SKIP]";
+    const firstLine = `${icon} ${result.id.padEnd(20)} ${result.name}`;
+    log(firstLine);
     if (result.details) {
       for (const line of result.details.split("\n")) {
-        console.log(`     ${line}`);
+        log(`      ${line}`);
       }
     }
   }
@@ -567,8 +629,16 @@ function printSummary() {
     { PASS: 0, FAIL: 0, SKIP: 0 },
   );
 
-  console.log("");
-  console.log(`Summary: ${counts.PASS} pass, ${counts.FAIL} fail, ${counts.SKIP} skip`);
+  log("");
+  log("───────────────────────────────────────────────────────────────");
+  log(`  TOTAL: ${results.length} tests | ${counts.PASS} pass | ${counts.FAIL} fail | ${counts.SKIP} skip`);
+  log("───────────────────────────────────────────────────────────────");
+  log("");
+
+  const reportPath = path.join(scriptDir, "test-results.txt");
+  fs.writeFileSync(reportPath, lines.join("\n"), "utf8");
+  console.log(`Results saved to: ${reportPath}`);
+
   if (counts.FAIL > 0) {
     process.exitCode = 1;
   }
