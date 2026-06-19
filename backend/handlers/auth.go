@@ -125,18 +125,33 @@ func Login(c *gin.Context) {
 		return
 	}
 
+	// Throttle brute force attempts per client IP and account identifier.
+	limiterKey := c.ClientIP() + "|" + strings.ToLower(req.Email)
+	if ok, retryAfter := loginAttempts.allow(limiterKey); !ok {
+		c.Header("Retry-After", fmt.Sprintf("%d", int(retryAfter.Seconds())+1))
+		c.JSON(http.StatusTooManyRequests, gin.H{
+			"error": "Too many failed login attempts. Please try again later.",
+		})
+		return
+	}
+
 	var user models.User
 	if err := database.DB.Where("email = ?", req.Email).First(&user).Error; err != nil {
 		// Use a generic message to avoid user enumeration
+		loginAttempts.recordFailure(limiterKey)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
 
 	// Compare submitted password against bcrypt hash
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		loginAttempts.recordFailure(limiterKey)
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid credentials"})
 		return
 	}
+
+	// Successful authentication clears the failure counter for this key.
+	loginAttempts.reset(limiterKey)
 
 	// Generate JWT token
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
