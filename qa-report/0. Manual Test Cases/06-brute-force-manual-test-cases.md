@@ -73,9 +73,7 @@ Diuji 2026-06-19.
 ![alt text](../6.%20Brute%20Force%20-%20Devy/image-2.png)
 
 **AFTER (Fixed — `security-training/` :8080):**
-
-![alt text](evidence/06/{B7CD6837-DC33-45A1-B517-09B89E7E6E5A}.png)
-![alt text](evidence/06/{911B850C-0DF1-4CF3-8143-02AD1954FAD1}.png)
+![alt text](evidence/06/{34DB6DD2-C158-40DF-843C-EDF0030D1195}.png)
 
 ## TC-BF-002: Registration Rejects Weak Passwords and Guides Users
 
