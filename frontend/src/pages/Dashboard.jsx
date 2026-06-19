@@ -6,10 +6,11 @@ import {
   updateTask,
   deleteTask,
   searchTasks,
+  logout,
 } from "../services/api";
 import { getUserData, clearUserData } from "../utils/storage";
 
-function Dashboard() {
+function Dashboard({setAuth}) {
   const [tasks, setTasks] = useState([]);
   const [searchResults, setSearchResults] = useState(null);
   const [newTask, setNewTask] = useState({
@@ -82,8 +83,14 @@ function Dashboard() {
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (err) {
+      //
+    }
     clearUserData();
+    setAuth(false);
     navigate("/login");
   };
 
