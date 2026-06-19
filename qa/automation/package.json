@@ -1,0 +1,20 @@
+{
+  "name": "securetask-qa-automation",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Phase 2 QA security automation for SecureTask — Cucumber (Gherkin) scenarios driven by Playwright.",
+  "scripts": {
+    "test": "cucumber-js",
+    "test:sql": "cucumber-js features/sql-injection.feature",
+    "test:xss": "cucumber-js features/xss.feature",
+    "test:auth": "cucumber-js features/auth.feature",
+    "test:storage": "cucumber-js features/insecure-data-storage.feature",
+    "test:secrets": "cucumber-js features/hardcoded-credentials.feature",
+    "test:bruteforce": "cucumber-js features/brute-force.feature",
+    "postinstall": "playwright install chromium"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^11.0.1",
+    "playwright": "^1.48.0"
+  }
+}
