@@ -1,0 +1,4 @@
+Scenario: Profile update cannot escalate role via mass assignment
+Status: PASSED
+Last API response: HTTP 200
+Body: {"id":227,"email":"qa-me-1781862251766-40249-8@example.com","name":"QA Updated","role":"user","bio":"","created_at":"2026-06-19T16:44:11.812882+07:00","updated_at":"2026-06-19T16:44:11.862891+07:00"}

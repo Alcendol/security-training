@@ -87,6 +87,6 @@ Keep profile bios rendered as safe text and protect profile updates with authent
 Retest after fixing both frontend rendering and backend profile update authorization.
 
 ### Retest Results (After Fix)
-**Retest Date**: Not started  
-**Status**: [ ] Vulnerability Fixed  [ ] Partially Fixed  [x] Not Fixed  
-**Notes**: Retest with `<img onerror>`, `<svg onload>`, and `javascript:` link payloads.
+**Retest Date**: 2026-06-19  
+**Status**: [x] Vulnerability Fixed [ ] Partially Fixed [ ] Not Fixed  
+**Notes**: Verified on the fixed build (`:8080`): profile `name`/`bio` are HTML-escaped server-side (`html.EscapeString` in `UpdateProfile`) and rendered as escaped text by React. The `<img src=x onerror=alert(...)>` payload in the bio is displayed as inert text and triggers no JS dialog/execution. Confirmed by automated suite `qa/automation` (feature `xss.feature`, profile-bio scenario). Note: `UpdateProfile` also enforces ownership (only own `id`), so cross-user bio injection is rejected with `403`.

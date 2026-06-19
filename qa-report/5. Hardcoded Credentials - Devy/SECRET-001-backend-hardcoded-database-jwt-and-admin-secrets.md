@@ -85,6 +85,6 @@ Keep backend secrets out of source code and load sensitive configuration from en
 This is intentional for training but should be rated as high in a real system.
 
 ### Retest Results (After Fix)
-**Retest Date**: Not started  
-**Status**: [ ] Vulnerability Fixed  [ ] Partially Fixed  [x] Not Fixed  
-**Notes**: Retest with source search and environment-based startup.
+**Retest Date**: 2026-06-19  
+**Status**: [x] Vulnerability Fixed [ ] Partially Fixed [ ] Not Fixed  
+**Notes**: Verified on the fixed build: backend secrets are read from the environment (`os.Getenv("JWT_SECRET")` with a startup check requiring ≥32 chars; DB credentials read inside `database.Connect()`). `backend/.env.example` ships only empty placeholders and the real `backend/.env` is gitignored (`.env`, `.env.*`). A scan of git-tracked source/config files finds no hardcoded `JWT_SECRET`/`DB_PASSWORD`/admin keys. Confirmed by automated suite `qa/automation` (feature `hardcoded-credentials.feature`, which scans only version-controlled files).

@@ -24,8 +24,12 @@ module.exports = {
   // The auth cookie name set by the backend (backend/handlers/auth.go).
   authCookieName: "auth_token",
 
-  // Run headed for debugging with HEADED=1.
+  // Run a visible browser with HEADED=1; slow each action with SLOWMO=<ms>.
   headed: process.env.HEADED === "1",
+  slowMo: Number(process.env.SLOWMO || 0),
+
+  // Where per-scenario evidence (screenshots, API transcripts) is written.
+  evidenceDir: path.join(__dirname, "..", "evidence"),
 
   payloads: {
     sqlInjection: [

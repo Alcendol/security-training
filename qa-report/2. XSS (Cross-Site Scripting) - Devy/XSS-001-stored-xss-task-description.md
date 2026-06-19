@@ -90,6 +90,6 @@ Keep task descriptions rendered as safe text and validate/sanitize task input be
 `<script>` tags inserted via `innerHTML` may not execute in all browsers. Event-handler payloads such as `<img onerror>` are better for verification.
 
 ### Retest Results (After Fix)
-**Retest Date**: Not started  
-**Status**: [ ] Vulnerability Fixed  [ ] Partially Fixed  [x] Not Fixed  
-**Notes**: Retest with image, SVG, link, and event-handler payloads.
+**Retest Date**: 2026-06-19  
+**Status**: [x] Vulnerability Fixed [ ] Partially Fixed [ ] Not Fixed  
+**Notes**: Verified on the fixed build (`:8080`): task title/description are HTML-escaped server-side (`html.EscapeString` in `CreateTask`/`UpdateTask`) and rendered as escaped text by React (no `dangerouslySetInnerHTML`). Payloads `<script>alert('XSS')</script>` and `<img src=x onerror=alert('XSS')>` are displayed as inert text and trigger no JS dialog/execution. Confirmed by automated suite `qa/automation` (feature `xss.feature`, screenshot evidence under `qa/automation/evidence/xss/`).

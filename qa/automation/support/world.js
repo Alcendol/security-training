@@ -44,7 +44,10 @@ class SecureTaskWorld extends World {
 
   async launchBrowser() {
     if (!this.browser) {
-      this.browser = await chromium.launch({ headless: !this.config.headed });
+      this.browser = await chromium.launch({
+        headless: !this.config.headed,
+        slowMo: this.config.slowMo,
+      });
     }
   }
 

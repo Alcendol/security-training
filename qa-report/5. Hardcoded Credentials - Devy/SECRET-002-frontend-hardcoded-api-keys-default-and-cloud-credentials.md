@@ -86,6 +86,6 @@ Keep secrets out of frontend source and browser bundles. This aligns with the de
 Even fake credentials should be removed or clearly isolated because they normalize unsafe patterns.
 
 ### Retest Results (After Fix)
-**Retest Date**: Not started  
-**Status**: [ ] Vulnerability Fixed  [ ] Partially Fixed  [x] Not Fixed  
-**Notes**: Retest by searching source and built assets.
+**Retest Date**: 2026-06-19  
+**Status**: [x] Vulnerability Fixed [ ] Partially Fixed [ ] Not Fixed  
+**Notes**: Verified on the fixed build: `frontend/src/config.js` reads `API_BASE_URL` from `import.meta.env.VITE_API_BASE_URL` (with a localhost fallback) and exposes no secrets. A scan of `frontend/src` finds no `ADMIN_API_KEY`, `DEFAULT_CREDENTIALS`, `admin-key`, cloud-key (`AKIA…`), or hardcoded passwords. Confirmed by automated suite `qa/automation` (feature `hardcoded-credentials.feature`).

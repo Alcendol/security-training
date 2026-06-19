@@ -1,0 +1,4 @@
+Scenario: Repeated failed logins are throttled
+Status: PASSED
+Last API response: HTTP 429
+Body: {"error":"Too many failed login attempts. Please try again later."}

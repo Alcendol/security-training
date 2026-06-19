@@ -26,12 +26,15 @@ qa/automation/
 ├── cucumber.js                 # Cucumber runner config
 ├── package.json
 ├── features/                   # Gherkin .feature files (one per category)
+├── formatters/
+│   └── scenario-status-formatter.js  # per-scenario/step PASS-FAIL + timing output
 ├── steps/                      # Playwright-backed step definitions
 │   └── common.steps.js         # shared Given/Then (login, status assertions)
-└── support/
-    ├── config.js               # URLs, seed accounts, payloads, repo root
-    ├── world.js                # custom World: Playwright browser + API contexts
-    └── hooks.js                # per-scenario teardown, default timeout
+├── support/
+│   ├── config.js               # URLs, seed accounts, payloads, headed/slowMo, evidence dir
+│   ├── world.js                # custom World: Playwright browser + API contexts
+│   └── hooks.js                # evidence capture + teardown
+└── evidence/                   # generated screenshots / transcripts (per run)
 ```
 
 ## Prerequisites
@@ -48,7 +51,9 @@ cd qa/automation
 npm install               # installs deps + Chromium (postinstall)
 # npx playwright install chromium   # run manually if postinstall was skipped
 
-npm test                  # run all features
+npm test                  # run all features (headless), per-scenario PASS/FAIL + timing
+npm run test:headed       # visible browser (HEADED=1 SLOWMO=300) — watch it drive localhost
+npm run test:compact      # dots-only progress bar
 npm run test:sql          # a single category
 npm run test:xss
 npm run test:auth
@@ -57,7 +62,22 @@ npm run test:secrets
 npm run test:bruteforce
 ```
 
-An HTML report is written to `reports/cucumber-report.html`.
+### Output & evidence
+
+- **Console**: a custom formatter ([formatters/scenario-status-formatter.js](formatters/scenario-status-formatter.js))
+  prints every feature → scenario → step with a `[PASS]`/`[FAIL]` label and its
+  execution time, ending in a totals block. Failures print the assertion message
+  inline.
+- **Evidence** (`evidence/<feature>/<scenario>__<STATUS>.png|.txt`): every
+  scenario produces an artifact. Browser scenarios save a **full-page
+  screenshot** of localhost; API scenarios save a **response transcript**. The
+  directory is wiped at the start of each run. Artifacts are also attached to the
+  HTML report.
+- **HTML report**: `reports/cucumber-report.html` (open in a browser; embeds the
+  screenshots). **Summary**: `reports/summary.txt`.
+
+Run headed (`npm run test:headed`) to see Chromium actually open localhost,
+log in, type payloads, and navigate — standard Playwright UI automation.
 
 ## Configuration (env vars)
 

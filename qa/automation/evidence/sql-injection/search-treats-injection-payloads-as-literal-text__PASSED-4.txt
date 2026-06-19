@@ -1,0 +1,4 @@
+Scenario: Search treats injection payloads as literal text
+Status: PASSED
+Last API response: HTTP 200
+Body: []

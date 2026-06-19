@@ -5,6 +5,8 @@
   "description": "Phase 2 QA security automation for SecureTask — Cucumber (Gherkin) scenarios driven by Playwright.",
   "scripts": {
     "test": "cucumber-js",
+    "test:headed": "HEADED=1 SLOWMO=300 cucumber-js",
+    "test:compact": "cucumber-js --format progress-bar",
     "test:sql": "cucumber-js features/sql-injection.feature",
     "test:xss": "cucumber-js features/xss.feature",
     "test:auth": "cucumber-js features/auth.feature",
@@ -15,6 +17,7 @@
   },
   "devDependencies": {
     "@cucumber/cucumber": "^11.0.1",
+    "@cucumber/pretty-formatter": "^1.0.1",
     "playwright": "^1.48.0"
   }
 }

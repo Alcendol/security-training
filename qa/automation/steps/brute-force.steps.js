@@ -22,6 +22,8 @@ When("I send {int} failed login attempts for that account", async function (coun
   }
   this.state.bruteForceStatuses = statuses;
   this.state.throttledResponse = throttledResponse;
+  // Record a representative response so the scenario produces evidence.
+  if (throttledResponse) await this.setLast(throttledResponse);
 });
 
 Then(

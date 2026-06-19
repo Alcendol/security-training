@@ -1,0 +1,4 @@
+Scenario: A regular user cannot reach the admin users endpoint
+Status: PASSED
+Last API response: HTTP 403
+Body: {"error":"Admin access required"}

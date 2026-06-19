@@ -1,0 +1,4 @@
+Scenario: The auth token is delivered in an HttpOnly cookie, not the body
+Status: PASSED
+Last API response: HTTP 200
+Body: {"user":{"id":229,"email":"qa-me-1781862253780-40249-19@example.com","name":"QA me","role":"user","bio":"","created_at":"2026-06-19T16:44:13.827859+07:00","updated_at":"2026-06-19T16:44:13.827859+07:00"}}

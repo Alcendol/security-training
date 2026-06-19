@@ -1,0 +1,4 @@
+Scenario: A user cannot update another user's profile (horizontal escalation)
+Status: PASSED
+Last API response: HTTP 403
+Body: {"error":"You can only update your own profile"}

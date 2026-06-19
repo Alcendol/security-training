@@ -1,0 +1,4 @@
+Scenario: Legitimate search still returns matching results
+Status: PASSED
+Last API response: HTTP 200
+Body: [{"id":151,"title":"Quarterly Report","description":"finish the report","status":"todo","priority":"medium","user_id":235,"user":{"id":235,"email":"qa-me-1781862254386-40249-25@example.com","name":"QA me","role":"user","bio":"","created_at":"2026-06-19T16:44:14.434189+07:00","updated_at":"2026-06-19T16:44:14.434189+07:00"},"created_at":"2026-06-19T16:44:14.484365+07:00","updated_at":"2026-06-19T16:44:14.484365+07:00"}]

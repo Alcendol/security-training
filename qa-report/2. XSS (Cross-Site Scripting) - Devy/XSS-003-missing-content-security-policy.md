@@ -85,6 +85,6 @@ Keep a restrictive Content Security Policy in place as defense in depth for XSS.
 Final verification should be done in the browser because CSP behavior is browser-enforced.
 
 ### Retest Results (After Fix)
-**Retest Date**: Not started  
-**Status**: [ ] Vulnerability Fixed  [ ] Partially Fixed  [x] Not Fixed  
-**Notes**: Retest by checking headers/meta tags and attempted script execution.
+**Retest Date**: 2026-06-19  
+**Status**: [x] Vulnerability Fixed [ ] Partially Fixed [ ] Not Fixed  
+**Notes**: Verified on the fixed build: `frontend/index.html` now defines a CSP meta tag (`default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' http://localhost:8080; frame-ancestors 'none'; form-action 'self';`) plus `X-Content-Type-Options: nosniff` and a referrer policy. `script-src 'self'` blocks inline/injected script execution. Confirmed by static check (STATIC-XSS-003 in `qa-report/0. Automated Script`). Note: `frame-ancestors` via `<meta>` is ignored by browsers — set it as a response header at the server/proxy for full clickjacking protection.

@@ -87,6 +87,6 @@ Enforce password length and quality requirements server-side, with matching fron
 Use unique test emails when retesting registration.
 
 ### Retest Results (After Fix)
-**Retest Date**: Not started  
-**Status**: [ ] Vulnerability Fixed  [ ] Partially Fixed  [x] Not Fixed  
-**Notes**: Retest with short, common, and valid strong passwords.
+**Retest Date**: 2026-06-19  
+**Status**: [x] Vulnerability Fixed [ ] Partially Fixed [ ] Not Fixed  
+**Notes**: Verified on the fixed build (`:8080`): `POST /api/auth/register` enforces a server-side password policy (`binding:"required,min=8,max=72"` plus `isStrongPassword`, requiring at least one letter and one digit). Weak passwords (e.g. `123`) are rejected with HTTP `400`; valid strong passwords are accepted. Confirmed by automated suite `qa/automation` (feature `brute-force.feature`, weak-password scenario).

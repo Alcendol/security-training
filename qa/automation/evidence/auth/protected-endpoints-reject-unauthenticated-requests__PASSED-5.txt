@@ -1,0 +1,4 @@
+Scenario: Protected endpoints reject unauthenticated requests
+Status: PASSED
+Last API response: HTTP 401
+Body: {"error":"Authentication required"}

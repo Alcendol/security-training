@@ -92,6 +92,6 @@ Add brute-force protection to the login endpoint. The developer fix list confirm
 Run brute force tests only against the local training environment.
 
 ### Retest Results (After Fix)
-**Retest Date**: Not started  
-**Status**: [ ] Vulnerability Fixed  [ ] Partially Fixed  [x] Not Fixed  
-**Notes**: Retest repeated failed login attempts after rate limiting is added.
+**Retest Date**: 2026-06-19  
+**Status**: [x] Vulnerability Fixed [ ] Partially Fixed [ ] Not Fixed  
+**Notes**: Verified on the fixed build (`:8080`): `POST /api/auth/login` is throttled per client IP + email (`backend/handlers/ratelimit.go`): after 5 failed attempts within a 15-minute window the key is locked out for 15 minutes, returning HTTP `429 Too Many Requests` with a `Retry-After` header; a successful login resets the counter. Repeated wrong-password attempts now hit `429`. Confirmed by automated suite `qa/automation` (feature `brute-force.feature`). Note: in-memory limiter resets on restart and is per-process; consider a shared store for multi-instance deployments.

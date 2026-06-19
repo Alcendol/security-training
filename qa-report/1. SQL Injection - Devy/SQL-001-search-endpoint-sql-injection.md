@@ -109,6 +109,6 @@ Keep the search remediation aligned with the backend fix documented by developer
 If the response is `null` or an empty array, first confirm that the `tasks` table contains data. The application seeds users only, not tasks.
 
 ### Retest Results (After Fix)
-**Retest Date**: Not started  
-**Status**: [ ] Vulnerability Fixed  [ ] Partially Fixed  [x] Not Fixed  
-**Notes**: Retest after search is parameterized and protected by authentication.
+**Retest Date**: 2026-06-19  
+**Status**: [x] Vulnerability Fixed [ ] Partially Fixed [ ] Not Fixed  
+**Notes**: Verified on the fixed build (`:8080`): `GET /api/tasks/search` now uses a parameterized, user-scoped GORM query (`Where("user_id = ? AND (title ILIKE ? OR description ILIKE ?)")`) and requires authentication. Injection payloads (`' OR '1'='1`, `' OR 1=1--`, `'; DROP TABLE tasks; --`, `' UNION SELECT * FROM users--`, `admin'--`) are treated as literal text — they return only matching/empty results, leak no other user's tasks, and expose no SQL errors; anonymous requests return `401`. Confirmed by automated suite `qa/automation` (feature `sql-injection.feature`).
