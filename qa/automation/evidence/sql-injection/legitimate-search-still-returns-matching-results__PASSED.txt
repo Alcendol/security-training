@@ -1,4 +1,4 @@
 Scenario: Legitimate search still returns matching results
 Status: PASSED
 Last API response: HTTP 200
-Body: [{"id":151,"title":"Quarterly Report","description":"finish the report","status":"todo","priority":"medium","user_id":235,"user":{"id":235,"email":"qa-me-1781862254386-40249-25@example.com","name":"QA me","role":"user","bio":"","created_at":"2026-06-19T16:44:14.434189+07:00","updated_at":"2026-06-19T16:44:14.434189+07:00"},"created_at":"2026-06-19T16:44:14.484365+07:00","updated_at":"2026-06-19T16:44:14.484365+07:00"}]
+Body: [{"id":160,"title":"Quarterly Report","description":"finish the report","status":"todo","priority":"medium","user_id":248,"user":{"id":248,"email":"qa-me-1781863459982-50081-25@example.com","name":"QA me","role":"user","bio":"","created_at":"2026-06-19T17:04:20.030977+07:00","updated_at":"2026-06-19T17:04:20.030977+07:00"},"created_at":"2026-06-19T17:04:20.080805+07:00","updated_at":"2026-06-19T17:04:20.080805+07:00"}]

@@ -1,4 +1,4 @@
 Scenario: A valid login still succeeds for an un-throttled account
 Status: PASSED
 Last API response: HTTP 200
-Body: {"user":{"id":228,"email":"qa-me-1781862252565-40249-11@example.com","name":"QA me","role":"user","bio":"","created_at":"2026-06-19T16:44:12.613374+07:00","updated_at":"2026-06-19T16:44:12.613374+07:00"}}
+Body: {"user":{"id":241,"email":"qa-me-1781863458101-50081-11@example.com","name":"QA me","role":"user","bio":"","created_at":"2026-06-19T17:04:18.149687+07:00","updated_at":"2026-06-19T17:04:18.149687+07:00"}}
